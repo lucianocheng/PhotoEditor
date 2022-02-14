@@ -5,8 +5,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import android.widget.ImageView
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * The handle view at the corner of image/text when adding a new sticker/text
@@ -18,21 +16,11 @@ class HandleView(context: Context, attributeSet: AttributeSet) : ImageView(conte
     ZoomListener {
 
     fun adjustSize(scale: Float) {
-        val backgroundScale = 1f / ZoomManager.scale
-        val size =
-            (resources.getDimensionPixelSize(R.dimen.handle_size) * scale * backgroundScale).toInt()
-        val borderMargin = resources.getDimensionPixelSize(R.dimen.border_margin)
-        val margin = max(borderMargin - size / 2, 0)
+        val size = scaleSize(scale, resources.getDimensionPixelSize(R.dimen.handle_size))
         val params = FrameLayout.LayoutParams(size, size)
-
-        params.bottomMargin = margin
-        params.topMargin = margin
-        params.leftMargin = margin
-        params.rightMargin = margin
         if (layoutParams is FrameLayout.LayoutParams) {
             params.gravity = (layoutParams as FrameLayout.LayoutParams).gravity
         }
-
         layoutParams = params
     }
 
@@ -56,5 +44,12 @@ class HandleView(context: Context, attributeSet: AttributeSet) : ImageView(conte
 
     private fun adjustScale() {
         adjustSize(1f)
+    }
+
+    companion object {
+        fun scaleSize(scale: Float, size: Int): Int {
+            val backgroundScale = 1f / ZoomManager.scale
+            return (size * scale * backgroundScale).toInt()
+        }
     }
 }

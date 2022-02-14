@@ -1,29 +1,23 @@
 package ja.burhanrashid52.photoeditor;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Matrix;
 import android.graphics.Rect;
-
-import androidx.annotation.Nullable;
-
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.Nullable;
 
 import java.util.Date;
 
 /**
  * Touch listener for stickers, emoji, text, etc.
- *
+ * <p>
  * Created on 18/01/2017.
  *
  * @author <a href="https://github.com/burhanrashid52">Burhanuddin Rashid</a>
@@ -32,8 +26,8 @@ import java.util.Date;
 public class MultiTouchListener implements OnTouchListener {
 
     private static final String TAG = "MultiTouchListener";
-    private static final float ABSOLUTE_MINIMUM_SCALE = 0.2f;
-    private static final float EDITOR_RELATIVE_MINIMUM_SCALE = 0.4f;
+    private static final float ABSOLUTE_MINIMUM_SCALE = 0.1f;
+    private static final float EDITOR_RELATIVE_MINIMUM_SCALE = 0.2f;
     private static final float EDITOR_RELATIVE_MAXIMUM_SCALE = 3.0f;
 
     private static final int INVALID_POINTER_ID = -1;
@@ -193,7 +187,11 @@ public class MultiTouchListener implements OnTouchListener {
         if (handleBottomRight != null) {
             handleBottomRight.adjustSize(1f / scale);
         }
-
+        if (borderView != null) {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) borderView.getLayoutParams();
+            int newMargin = HandleView.Companion.scaleSize(1 / scale, borderView.getContext().getResources().getDimensionPixelSize(R.dimen.border_margin));
+            params.setMargins(newMargin, newMargin, newMargin, newMargin);
+        }
         // Rotate the actual outer view.
         float rotation = adjustAngle(initialStickerRotation + info.deltaAngle);
         view.setRotation(rotation);
