@@ -187,11 +187,19 @@ public class MultiTouchListener implements OnTouchListener {
         if (handleBottomRight != null) {
             handleBottomRight.adjustSize(1f / scale);
         }
+
+        // Change border margin to keep the handler center is in border line.
+        // That will make pivot is changed. So have to update again after update border margin
+        float oldX = view.getPivotX();
+        float oldY = view.getPivotY();
         if (borderView != null) {
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) borderView.getLayoutParams();
             int newMargin = HandleView.Companion.scaleSize(1 / scale, borderView.getContext().getResources().getDimensionPixelSize(R.dimen.border_margin));
             params.setMargins(newMargin, newMargin, newMargin, newMargin);
         }
+        view.setPivotX(oldX);
+        view.setPivotY(oldY);
+
         // Rotate the actual outer view.
         float rotation = adjustAngle(initialStickerRotation + info.deltaAngle);
         view.setRotation(rotation);
