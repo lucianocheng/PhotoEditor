@@ -170,11 +170,6 @@ public class MultiTouchListener implements OnTouchListener {
         final HandleView handleBottomLeft = view.findViewById(R.id.imgHandleBottomLeft);
         final HandleView handleBottomRight = view.findViewById(R.id.imgHandleBottomRight);
 
-        // Scale the actual outer view
-        // TODO(cheng): Change 'view' to 'graphicView'
-        view.setScaleX(scale);
-        view.setScaleY(scale);
-
         if (handleTopLeft != null) {
             handleTopLeft.adjustSize(1f / scale);
         }
@@ -199,6 +194,11 @@ public class MultiTouchListener implements OnTouchListener {
         }
         view.setPivotX(oldX);
         view.setPivotY(oldY);
+
+        // Scale the actual outer view
+        // TODO(cheng): Change 'view' to 'graphicView'
+        view.setScaleX(scale);
+        view.setScaleY(scale);
 
         // Rotate the actual outer view.
         float rotation = adjustAngle(initialStickerRotation + info.deltaAngle);
