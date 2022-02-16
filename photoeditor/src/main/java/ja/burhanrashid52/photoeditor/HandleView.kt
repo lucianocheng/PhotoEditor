@@ -19,21 +19,11 @@ class HandleView(context: Context, attributeSet: AttributeSet) : ImageView(conte
 
     fun adjustSize(scale: Float) {
         val backgroundScale = 1f / ZoomManager.scale
-        val size =
-            (resources.getDimensionPixelSize(R.dimen.handle_size) * scale * backgroundScale).toInt()
-        val borderMargin = resources.getDimensionPixelSize(R.dimen.border_margin)
-        val margin = max(borderMargin - size / 2, 0)
-        val params = FrameLayout.LayoutParams(size, size)
-
-        params.bottomMargin = margin
-        params.topMargin = margin
-        params.leftMargin = margin
-        params.rightMargin = margin
-        if (layoutParams is FrameLayout.LayoutParams) {
-            params.gravity = (layoutParams as FrameLayout.LayoutParams).gravity
+        val size = (resources.getDimensionPixelSize(R.dimen.handle_size) * scale * backgroundScale).toInt()
+        layoutParams = layoutParams.apply {
+            width = size
+            height = size
         }
-
-        layoutParams = params
     }
 
     override fun onBackgroundZoomStarted() {

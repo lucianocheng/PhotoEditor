@@ -170,33 +170,19 @@ public class MultiTouchListener implements OnTouchListener {
             return;
         }
 
-        final BorderView borderView = view.findViewById(R.id.frmBorder);
-        final HandleView handleTopLeft = view.findViewById(R.id.imgHandleTopLeft);
-        final HandleView handleTopRight = view.findViewById(R.id.imgHandleTopRight);
-        final HandleView handleBottomLeft = view.findViewById(R.id.imgHandleBottomLeft);
-        final HandleView handleBottomRight = view.findViewById(R.id.imgHandleBottomRight);
-
         // Scale the actual outer view
         // TODO(cheng): Change 'view' to 'graphicView'
         view.setScaleX(scale);
         view.setScaleY(scale);
 
-        if (handleTopLeft != null) {
-            handleTopLeft.adjustSize(1f / scale);
-        }
-        if (handleTopRight != null) {
-            handleTopRight.adjustSize(1f / scale);
-        }
-        if (handleBottomLeft != null) {
-            handleBottomLeft.adjustSize(1f / scale);
-        }
-        if (handleBottomRight != null) {
-            handleBottomRight.adjustSize(1f / scale);
-        }
-
         // Rotate the actual outer view.
         float rotation = adjustAngle(initialStickerRotation + info.deltaAngle);
         view.setRotation(rotation);
+
+        if (view instanceof GraphicView) {
+            GraphicView graphicView = (GraphicView) view;
+            graphicView.adjustHandleSizeAndBorder();
+        }
     }
 
     static void adjustTranslation(
