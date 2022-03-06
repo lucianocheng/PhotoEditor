@@ -1,17 +1,20 @@
-package ja.burhanrashid52.photoeditor;
+package ja.burhanrashid52.photoeditor
 
 /**
- * <p>
- * Type of pre-defined filter effect for {@link ImageFilterView}
- * </p>
  *
- * @author <a href="https://github.com/burhanrashid52">Burhanuddin Rashid</a>
+ *
+ * Type of pre-defined filter effect for [ImageFilterView]
+ *
+ *
+ * @author [Burhanuddin Rashid](https://github.com/burhanrashid52)
  * @version 0.1.2
  * @see android.media.effect.EffectFactory
+ *
  * @see android.media.effect.Effect
+ *
  * @since 2/14/2018
  */
-public enum PhotoFilter {
+enum class PhotoFilter {
     NONE,
     AUTO_FIX,
     BLACK_WHITE,
@@ -35,5 +38,5 @@ public enum PhotoFilter {
     SHARPEN,
     TEMPERATURE,
     TINT,
-    VIGNETTE,
+    VIGNETTE
 }
