@@ -281,9 +281,9 @@ class MultiTouchListener(
         @kotlin.jvm.JvmField
         var deltaAngle = 0f
         @kotlin.jvm.JvmField
-        var pivotX = 0f
+        var pivotX:Float? = 0f
         @kotlin.jvm.JvmField
-        var pivotY = 0f
+        var pivotY:Float? = 0f
         @kotlin.jvm.JvmField
         var minimumScale = 0f
         @kotlin.jvm.JvmField
