@@ -303,7 +303,6 @@ public interface PhotoEditor {
 
         Context context;
         PhotoEditorView editorView;
-//        RelativeLayout parentView;
         RelativeLayout canvasView;
         ImageView imageView;
         View deleteView;

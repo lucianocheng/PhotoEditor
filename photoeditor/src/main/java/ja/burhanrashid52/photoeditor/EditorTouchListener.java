@@ -193,7 +193,7 @@ class EditorTouchListener implements OnTouchListener {
                 MultiTouchListener.move(
                         viewState.getCurrentSelectedView(),
                         info,
-                        photoEditorView.getScaleX(),
+                        photoEditorView.getParentLayout().getScaleX(),
                         initialScale,
                         initialRotation
                 );
