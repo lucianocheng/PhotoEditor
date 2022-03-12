@@ -53,7 +53,7 @@ class MultiTouchListener(
     private var outRect: Rect? = null
     private val deleteView: View?
     private val photoEditImageView: ImageView?
-    private val photoEditorView: PhotoEditorView
+    val photoEditorView: PhotoEditorView
     var canvasView: RelativeLayout
     private var onMultiTouchListener: OnMultiTouchListener? = null
     private var mOnGestureControl: OnGestureControl? = null
