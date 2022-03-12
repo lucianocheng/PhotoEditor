@@ -83,7 +83,7 @@ public class PhotoEditorImpl implements PhotoEditor {
                 canvasView,
                 this.viewState);
 
-        editorView.setOnTouchListener(mEditorTouchListener);
+        editorView.getParentLayout().setOnTouchListener(mEditorTouchListener);
     }
 
     @Override
