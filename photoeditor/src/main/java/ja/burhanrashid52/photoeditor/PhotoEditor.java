@@ -303,7 +303,7 @@ public interface PhotoEditor {
 
         Context context;
         PhotoEditorView editorView;
-        RelativeLayout parentView;
+//        RelativeLayout parentView;
         RelativeLayout canvasView;
         ImageView imageView;
         View deleteView;
@@ -326,7 +326,6 @@ public interface PhotoEditor {
         public Builder(Context context, PhotoEditorView photoEditorView) {
             this.context = context;
             editorView = photoEditorView;
-            parentView = photoEditorView.getParentLayout();
             canvasView = photoEditorView.getCanvasLayout();
             imageView = photoEditorView.getSource();
             overlayView = photoEditorView.getImageOverlayView();
