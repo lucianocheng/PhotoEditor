@@ -6,7 +6,7 @@ import java.util.*
 /**
  * Tracked state of user-added views (stickers, emoji, text, etc)
  */
-internal class PhotoEditorViewState {
+class PhotoEditorViewState {
     var currentSelectedView: View? = null
     private val addedViews: MutableList<View>
     private val redoViews: Stack<View>
