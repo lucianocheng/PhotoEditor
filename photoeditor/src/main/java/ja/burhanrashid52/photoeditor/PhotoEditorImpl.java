@@ -52,7 +52,6 @@ public class PhotoEditorImpl implements PhotoEditor {
 
     // NOTE(kleyow): This is custom added code diverging from https://github.com/burhanrashid52/PhotoEditor
     private EditorTouchListener mEditorTouchListener;
-    private RelativeLayout parentView;
     private RelativeLayout canvasView;
     private ImageView overlayView;
     private ImageView backgroundView;
@@ -61,7 +60,6 @@ public class PhotoEditorImpl implements PhotoEditor {
     protected PhotoEditorImpl(Builder builder) {
         Context context = builder.context;
         this.editorView = builder.editorView;
-        this.parentView = builder.parentView;
         this.canvasView = builder.canvasView;
         this.mainImageView = builder.imageView;
         this.deleteView = builder.deleteView;
@@ -81,11 +79,11 @@ public class PhotoEditorImpl implements PhotoEditor {
 
         // Create scaling logic for background image.
         this.mEditorTouchListener = new EditorTouchListener(
-                parentView,
+                editorView,
                 canvasView,
                 this.viewState);
 
-        parentView.setOnTouchListener(mEditorTouchListener);
+        editorView.getParentLayout().setOnTouchListener(mEditorTouchListener);
     }
 
     @Override
@@ -267,7 +265,7 @@ public class PhotoEditorImpl implements PhotoEditor {
     private MultiTouchListener getMultiTouchListener(final boolean isPinchScalable) {
         return new MultiTouchListener(
                 deleteView,
-                parentView,
+                editorView,
                 canvasView,
                 this.mainImageView,
                 isPinchScalable,

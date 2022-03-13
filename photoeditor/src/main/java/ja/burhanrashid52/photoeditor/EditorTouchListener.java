@@ -31,7 +31,7 @@ class EditorTouchListener implements OnTouchListener {
     private float mPrevX, mPrevY;
     private ScaleGestureDetector mScaleGestureDetector;
 
-    private RelativeLayout parentView;
+    private PhotoEditorView photoEditorView;
     private RelativeLayout canvasView;
 
     private BoxHelper boxHelper;
@@ -43,13 +43,13 @@ class EditorTouchListener implements OnTouchListener {
     private float currentSelectedX, currentSelectedY;
     private boolean scalingInProgress = false;
 
-    EditorTouchListener(final RelativeLayout parentView,
+    EditorTouchListener(final PhotoEditorView photoEditorView,
                         final RelativeLayout canvasView,
                         final PhotoEditorViewState viewState
     ) {
         mScaleGestureDetector = new ScaleGestureDetector(new ScaleGestureListener());
         mGestureListener = new GestureDetector(new GestureListener());
-        this.parentView = parentView;
+        this.photoEditorView = photoEditorView;
         this.canvasView = canvasView;
         this.viewState = viewState;
         this.boxHelper =  new BoxHelper(canvasView, viewState);
@@ -193,7 +193,7 @@ class EditorTouchListener implements OnTouchListener {
                 MultiTouchListener.move(
                         viewState.getCurrentSelectedView(),
                         info,
-                        parentView.getScaleX(),
+                        photoEditorView.getParentLayout().getScaleX(),
                         initialScale,
                         initialRotation
                 );
