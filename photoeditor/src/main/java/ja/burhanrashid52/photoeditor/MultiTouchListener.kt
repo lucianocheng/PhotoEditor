@@ -281,9 +281,9 @@ class MultiTouchListener(
         @JvmField
         var deltaAngle = 0f
         @JvmField
-        var pivotX = 0f
+        var pivotX: Float? = 0f
         @JvmField
-        var pivotY = 0f
+        var pivotY: Float? = 0f
         @JvmField
         var minimumScale = 0f
         @JvmField
