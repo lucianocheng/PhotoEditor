@@ -272,21 +272,21 @@ class MultiTouchListener(
     }
 
     class TransformInfo {
-        @kotlin.jvm.JvmField
+        @JvmField
         var deltaX = 0f
-        @kotlin.jvm.JvmField
+        @JvmField
         var deltaY = 0f
-        @kotlin.jvm.JvmField
+        @JvmField
         var deltaScale = 0f
-        @kotlin.jvm.JvmField
+        @JvmField
         var deltaAngle = 0f
-        @kotlin.jvm.JvmField
-        var pivotX:Float? = 0f
-        @kotlin.jvm.JvmField
-        var pivotY:Float? = 0f
-        @kotlin.jvm.JvmField
+        @JvmField
+        var pivotX: Float? = 0f
+        @JvmField
+        var pivotY: Float? = 0f
+        @JvmField
         var minimumScale = 0f
-        @kotlin.jvm.JvmField
+        @JvmField
         var maximumScale = 0f
     }
 
