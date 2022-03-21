@@ -386,7 +386,7 @@ class MultiTouchListener(
             // NOTE(cheng): Since `ZoomLayout.getMaxZoom()` is a constant value of 4,
             //              this being NaN should be impossible.  However, this appears to be
             //              the likely candidate causing a NaN issue.
-            val baseZoomAmount = ZoomLayout.getMaxZoom() - 1
+            val baseZoomAmount = ZoomLayout.maxZoom - 1
             if (java.lang.Float.isNaN(baseZoomAmount)) {
                 Log.e(TAG, "NaN scale value in MultiTouchListener:151")
                 return
