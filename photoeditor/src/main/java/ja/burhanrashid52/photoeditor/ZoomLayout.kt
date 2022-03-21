@@ -77,7 +77,7 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
             when (motionEvent.action and MotionEvent.ACTION_MASK) {
                 MotionEvent.ACTION_DOWN -> {
                     Log.i(TAG, "DOWN")
-                    if (scale > minZoom) {
+                    if (scale > MIN_ZOOM) {
                         mode = Mode.DRAG
                         startX = motionEvent.x - prevDx
                         startY = motionEvent.y - prevDy
@@ -97,7 +97,7 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
                 }
             }
             scaleDetector.onTouchEvent(motionEvent)
-            if (mode == Mode.DRAG && scale >= minZoom || mode == Mode.ZOOM) {
+            if (mode == Mode.DRAG && scale >= MAX_ZOOM || mode == Mode.ZOOM) {
                 parent.requestDisallowInterceptTouchEvent(true)
                 val maxDx = child().width * (scale - 1)
                 val maxDy = child().height * (scale - 1)
@@ -131,7 +131,7 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
         if (lastScaleFactor == 0f || Math.signum(scaleFactor) == Math.signum(lastScaleFactor)) {
             val prevScale = scale
             scale *= scaleFactor
-            scale = Math.max(minZoom, Math.min(scale, maxZoom))
+            scale = Math.max(MIN_ZOOM, Math.min(scale, MAX_ZOOM))
             lastScaleFactor = scaleFactor
             val adjustedScaleFactor = scale / prevScale
             Log.d(TAG, "onScale, adjustedScaleFactor = $adjustedScaleFactor")
@@ -167,7 +167,7 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
 
     companion object {
         private const val TAG = "ZoomLayout"
-        const val minZoom = 1.0f
-        const val maxZoom = 4.0f
+        const val MIN_ZOOM = 1.0f
+        const val MAX_ZOOM = 4.0f
     }
 }
