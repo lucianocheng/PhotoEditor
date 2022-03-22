@@ -97,7 +97,7 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
                 }
             }
             scaleDetector.onTouchEvent(motionEvent)
-            if (mode == Mode.DRAG && scale >= MAX_ZOOM || mode == Mode.ZOOM) {
+            if (mode == Mode.DRAG && scale >= MIN_ZOOM || mode == Mode.ZOOM) {
                 parent.requestDisallowInterceptTouchEvent(true)
                 val maxDx = child().width * (scale - 1)
                 val maxDy = child().height * (scale - 1)
