@@ -291,6 +291,7 @@ interface PhotoEditor {
     fun getMainImageLockValue(): Boolean
     fun lockMainImage()
     fun unlockMainImage()
+    val viewState: PhotoEditorViewState
 
     /**
      * Builder pattern to define [PhotoEditor] Instance

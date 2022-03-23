@@ -30,7 +30,7 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
     builder: PhotoEditor.Builder
 ) : PhotoEditor {
     private val photoEditorView: PhotoEditorView = builder.photoEditorView
-    private val viewState: PhotoEditorViewState = PhotoEditorViewState()
+    override val viewState: PhotoEditorViewState = PhotoEditorViewState()
     private val mainImageView: ImageView? = builder.imageView
     private val deleteView: View? = builder.deleteView
     private val drawingView: DrawingView? = builder.drawingView
