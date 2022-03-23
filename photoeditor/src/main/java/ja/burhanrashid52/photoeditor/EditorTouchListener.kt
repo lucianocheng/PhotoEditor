@@ -168,7 +168,7 @@ internal class EditorTouchListener(
                 move(
                     viewState.currentSelectedView!!,
                     info,
-                    photoEditorView.parentLayout.scaleX,
+                    photoEditorView.parentLayout!!.scaleX,
                     initialScale,
                     initialRotation
                 )

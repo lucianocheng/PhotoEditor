@@ -10,7 +10,7 @@ class PhotoEditorViewState {
     var currentSelectedView: View? = null
     private val addedViews: MutableList<View>
     private val redoViews: Stack<View>
-    val multiTouchListenerByView: Map<View, MultiTouchListener>
+    val multiTouchListenerByView: MutableMap<View, MultiTouchListener>
     fun clearCurrentSelectedView() {
         currentSelectedView = null
     }
