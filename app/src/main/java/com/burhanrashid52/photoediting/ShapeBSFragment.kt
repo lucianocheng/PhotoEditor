@@ -6,11 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioGroup
 import android.widget.SeekBar
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.burhanrashid52.photoediting.ColorPickerAdapter.OnColorPickerClickListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import ja.burhanrashid52.photoeditor.shape.ShapeType
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.burhanrashid52.photoediting.ColorPickerAdapter.OnColorPickerClickListener
 
 class ShapeBSFragment : BottomSheetDialogFragment(), SeekBar.OnSeekBarChangeListener {
     private var mProperties: Properties? = null
@@ -39,29 +42,34 @@ class ShapeBSFragment : BottomSheetDialogFragment(), SeekBar.OnSeekBarChangeList
 
         // shape picker
         shapeGroup.setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
-            when(checkedId) {
+            when (checkedId) {
                 R.id.lineRadioButton -> {
-                    mProperties!!.onShapePicked(ShapeType.LINE)
+                    mProperties!!.onShapePicked(ShapeType.Line)
+                }
+                R.id.arrowRadioButton -> {
+                    mProperties!!.onShapePicked(ShapeType.Arrow())
                 }
                 R.id.ovalRadioButton -> {
-                    mProperties!!.onShapePicked(ShapeType.OVAL)
+                    mProperties!!.onShapePicked(ShapeType.Oval)
                 }
                 R.id.rectRadioButton -> {
-                    mProperties!!.onShapePicked(ShapeType.RECTANGLE)
+                    mProperties!!.onShapePicked(ShapeType.Rectangle)
                 }
                 else -> {
-                    mProperties!!.onShapePicked(ShapeType.BRUSH)
+                    mProperties!!.onShapePicked(ShapeType.Brush)
                 }
             }
         }
         sbOpacity.setOnSeekBarChangeListener(this)
         sbBrushSize.setOnSeekBarChangeListener(this)
 
+        val activity = requireActivity()
+
         // TODO(lucianocheng): Move layoutManager to a xml file.
         val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         rvColor.layoutManager = layoutManager
         rvColor.setHasFixedSize(true)
-        val colorPickerAdapter = ColorPickerAdapter(activity!!)
+        val colorPickerAdapter = ColorPickerAdapter(activity)
         colorPickerAdapter.setOnColorPickerClickListener(object : OnColorPickerClickListener {
             override fun onColorPickerClickListener(colorCode: Int) {
                 if (mProperties != null) {

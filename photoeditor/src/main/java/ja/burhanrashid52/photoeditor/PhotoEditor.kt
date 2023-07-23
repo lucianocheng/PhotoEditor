@@ -224,49 +224,31 @@ interface PhotoEditor {
      * Save the edited image on given path
      *
      * @param imagePath      path on which image to be saved
-     * @param onSaveListener callback for saving image
-     * @see OnSaveListener
-     */
-    @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
-    fun saveAsFile(imagePath: String, onSaveListener: OnSaveListener)
-
-    /**
-     * Save the edited image on given path
-     *
-     * @param imagePath      path on which image to be saved
      * @param saveSettings   builder for multiple save options [SaveSettings]
      * @param onSaveListener callback for saving image
      * @see OnSaveListener
      */
     @SuppressLint("StaticFieldLeak")
     @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
-    fun saveAsFile(
+    suspend fun saveAsFile(
         imagePath: String,
-        saveSettings: SaveSettings,
-        onSaveListener: OnSaveListener
-    )
-
-    /**
-     * Save the edited image as bitmap
-     *
-     * @param onSaveBitmap callback for saving image as bitmap
-     * @see OnSaveBitmap
-     */
-    @SuppressLint("StaticFieldLeak")
-    fun saveAsBitmap(onSaveBitmap: OnSaveBitmap)
+        saveSettings: SaveSettings = SaveSettings.Builder().build()
+    ): SaveFileResult
 
     /**
      * Save the edited image as bitmap
      *
      * @param saveSettings builder for multiple save options [SaveSettings]
-     * @param onSaveBitmap callback for saving image as bitmap
-     * @see OnSaveBitmap
      */
-    @SuppressLint("StaticFieldLeak")
-    fun saveAsBitmap(
-        saveSettings: SaveSettings,
-        onSaveBitmap: OnSaveBitmap
-    )
+    suspend fun saveAsBitmap(saveSettings: SaveSettings = SaveSettings.Builder().build()): Bitmap
+
+    fun saveAsFile(imagePath: String, saveSettings: SaveSettings, onSaveListener: OnSaveListener)
+
+    fun saveAsFile(imagePath: String, onSaveListener: OnSaveListener)
+
+    fun saveAsBitmap(saveSettings: SaveSettings, onSaveBitmap: OnSaveBitmap)
+
+    fun saveAsBitmap(onSaveBitmap: OnSaveBitmap)
 
     /**
      * Callback on editing operation perform on [PhotoEditorView]
@@ -317,6 +299,7 @@ interface PhotoEditor {
         // By default, pinch-to-scale is enabled for text
         @JvmField
         var isTextPinchScalable = true
+
         @JvmField
         var clipSourceImage = false
         fun setDeleteView(deleteView: View?): Builder {
@@ -409,6 +392,7 @@ interface PhotoEditor {
          */
         fun onFailure(exception: Exception)
     }
+
     // region Shape
     /**
      * Update the current shape to be drawn,

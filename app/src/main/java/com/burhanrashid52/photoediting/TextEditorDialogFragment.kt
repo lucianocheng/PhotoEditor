@@ -11,12 +11,17 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
+import androidx.annotation.ColorInt
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.burhanrashid52.photoediting.ColorPickerAdapter.OnColorPickerClickListener
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.burhanrashid52.photoediting.ColorPickerAdapter.OnColorPickerClickListener
 import kotlin.jvm.JvmOverloads
 import androidx.appcompat.app.AppCompatActivity
-import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 
@@ -24,9 +29,10 @@ import androidx.fragment.app.DialogFragment
  * Created by Burhanuddin Rashid on 1/16/2018.
  */
 class TextEditorDialogFragment : DialogFragment() {
-    private var mAddTextEditText: EditText? = null
-    private var mAddTextDoneTextView: TextView? = null
-    private var mInputMethodManager: InputMethodManager? = null
+
+    private lateinit var mAddTextEditText: EditText
+    private lateinit var mAddTextDoneTextView: TextView
+    private lateinit var mInputMethodManager: InputMethodManager
     private var mColorCode = 0
     private var mTextEditorListener: TextEditorListener? = null
 
@@ -56,6 +62,9 @@ class TextEditorDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val activity = requireActivity()
+
         mAddTextEditText = view.findViewById(R.id.add_text_edit_text)
         mInputMethodManager =
             activity!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -73,22 +82,27 @@ class TextEditorDialogFragment : DialogFragment() {
         colorPickerAdapter.setOnColorPickerClickListener(object : OnColorPickerClickListener {
             override fun onColorPickerClickListener(colorCode: Int) {
                 mColorCode = colorCode
-                mAddTextEditText!!.setTextColor(colorCode)
+                mAddTextEditText.setTextColor(colorCode)
             }
         })
+
         addTextColorPickerRecyclerView.adapter = colorPickerAdapter
-        mAddTextEditText!!.setText(arguments!!.getString(EXTRA_INPUT_TEXT))
-        mColorCode = arguments!!.getInt(EXTRA_COLOR_CODE)
-        mAddTextEditText!!.setTextColor(mColorCode)
-        mInputMethodManager!!.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+
+        val arguments = requireArguments()
+
+        mAddTextEditText.setText(arguments.getString(EXTRA_INPUT_TEXT))
+        mColorCode = arguments.getInt(EXTRA_COLOR_CODE)
+        mAddTextEditText.setTextColor(mColorCode)
+        mInputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
 
         //Make a callback on activity when user is done with text editing
-        mAddTextDoneTextView!!.setOnClickListener { onClickListenerView ->
-            mInputMethodManager!!.hideSoftInputFromWindow(onClickListenerView.windowToken, 0)
+        mAddTextDoneTextView.setOnClickListener { onClickListenerView ->
+            mInputMethodManager.hideSoftInputFromWindow(onClickListenerView.windowToken, 0)
             dismiss()
-            val inputText = mAddTextEditText!!.text.toString()
+            val inputText = mAddTextEditText.text.toString()
+            val textEditorListener = mTextEditorListener
             if (!TextUtils.isEmpty(inputText) && mTextEditorListener != null) {
-                mTextEditorListener!!.onDone(inputText, mColorCode)
+                textEditorListener.onDone(inputText, mColorCode)
             }
         }
     }

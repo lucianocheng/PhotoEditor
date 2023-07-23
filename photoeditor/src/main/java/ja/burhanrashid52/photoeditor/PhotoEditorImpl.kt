@@ -2,6 +2,22 @@ package ja.burhanrashid52.photoeditor
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Typeface
+import android.text.TextUtils
+import android.view.GestureDetector
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.annotation.IntRange
+import androidx.annotation.RequiresPermission
+import ja.burhanrashid52.photoeditor.PhotoEditorImageViewListener.OnSingleTapUpCallback
+import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.text.TextUtils
@@ -336,31 +352,47 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
     }
 
     @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
-    override fun saveAsFile(imagePath: String, onSaveListener: OnSaveListener) {
-        saveAsFile(imagePath, SaveSettings.Builder().build(), onSaveListener)
+    override suspend fun saveAsFile(
+        imagePath: String,
+        saveSettings: SaveSettings
+    ): SaveFileResult = withContext(Dispatchers.Main) {
+        photoEditorView.saveFilter()
+        val photoSaverTask = PhotoSaverTask(photoEditorView, mBoxHelper, saveSettings)
+        return@withContext photoSaverTask.saveImageAsFile(imagePath)
     }
 
-    @SuppressLint("StaticFieldLeak")
+    override suspend fun saveAsBitmap(
+        saveSettings: SaveSettings
+    ): Bitmap = withContext(Dispatchers.Main) {
+        photoEditorView.saveFilter()
+        val photoSaverTask = PhotoSaverTask(photoEditorView, mBoxHelper, saveSettings)
+        return@withContext photoSaverTask.saveImageAsBitmap()
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
     override fun saveAsFile(
         imagePath: String,
         saveSettings: SaveSettings,
-        onSaveListener: OnSaveListener
+        onSaveListener: PhotoEditor.OnSaveListener
     ) {
-        Log.d(TAG, "Image Path: $imagePath")
-        photoEditorView.saveFilter(object : OnSaveBitmap {
-            override fun onBitmapReady(saveBitmap: Bitmap?) {
-                val photoSaverTask = PhotoSaverTask(photoEditorView, mBoxHelper)
-                photoSaverTask.setOnSaveListener(onSaveListener)
-                photoSaverTask.setSaveSettings(saveSettings)
-                photoSaverTask.execute(imagePath)
+        GlobalScope.launch(Dispatchers.Main) {
+            when (val result = saveAsFile(imagePath, saveSettings)) {
+                is SaveFileResult.Success -> onSaveListener.onSuccess(imagePath)
+                is SaveFileResult.Failure -> onSaveListener.onFailure(result.exception)
             }
+        }
+    }
 
-            override fun onFailure(e: Exception?) {
-                e?.run {
-                    onSaveListener.onFailure(this)
-                }
-            }
-        })
+    @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
+    override fun saveAsFile(imagePath: String, onSaveListener: PhotoEditor.OnSaveListener) {
+        saveAsFile(imagePath, SaveSettings.Builder().build(), onSaveListener)
+    }
+
+    override fun saveAsBitmap(saveSettings: SaveSettings, onSaveBitmap: OnSaveBitmap) {
+        GlobalScope.launch(Dispatchers.Main) {
+            val bitmap = saveAsBitmap(saveSettings)
+            onSaveBitmap.onBitmapReady(bitmap)
+        }
     }
 
     override fun saveAsBitmap(onSaveBitmap: OnSaveBitmap) {

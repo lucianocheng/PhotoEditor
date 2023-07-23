@@ -25,7 +25,9 @@ internal class Text(
     viewType = ViewType.TEXT,
     layoutId = R.layout.view_photo_editor_text
 ) {
+
     private var mTextView: TextView? = null
+
     fun buildView(text: String?, styleBuilder: TextStyleBuilder?) {
         mTextView?.apply {
             this.text = text

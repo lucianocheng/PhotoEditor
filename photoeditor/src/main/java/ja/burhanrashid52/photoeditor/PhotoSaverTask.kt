@@ -10,6 +10,12 @@ import android.view.View
 import ja.burhanrashid52.photoeditor.BitmapUtil.removeTransparency
 import ja.burhanrashid52.photoeditor.PhotoEditor.OnSaveListener
 import ja.burhanrashid52.photoeditor.PhotoSaverTask.SaveResult
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.view.View
+import ja.burhanrashid52.photoeditor.BitmapUtil.removeTransparency
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -19,39 +25,65 @@ import java.io.IOException
  *
  * @author <https:></https:>//github.com/burhanrashid52>
  */
-internal class PhotoSaverTask(photoEditorView: PhotoEditorView, boxHelper: BoxHelper) :
-    AsyncTask<String?, String?, SaveResult>() {
-    private var mSaveSettings: SaveSettings
-    private var mOnSaveListener: OnSaveListener? = null
-    private var mOnSaveBitmap: OnSaveBitmap? = null
-    private val mPhotoEditorView: PhotoEditorView?
-    private val mBoxHelper: BoxHelper
-    private val mDrawingView: DrawingView?
-    fun setOnSaveListener(onSaveListener: OnSaveListener?) {
-        mOnSaveListener = onSaveListener
+internal class PhotoSaverTask(
+    private val photoEditorView: PhotoEditorView,
+    private val boxHelper: BoxHelper,
+    private var saveSettings: SaveSettings
+) {
+
+    private val drawingView: DrawingView = photoEditorView.drawingView
+
+    private fun onBeforeSaveImage() {
+        boxHelper.clearHelperBox()
+        drawingView.destroyDrawingCache()
     }
 
-    fun setOnSaveBitmap(onSaveBitmap: OnSaveBitmap?) {
-        mOnSaveBitmap = onSaveBitmap
+    fun saveImageAsBitmap(): Bitmap {
+        onBeforeSaveImage()
+        val bitmap = buildBitmap()
+        if (saveSettings.isClearViewsEnabled) {
+            boxHelper.clearAllViews(drawingView)
+        }
+        return bitmap
     }
 
-    fun setSaveSettings(saveSettings: SaveSettings) {
-        mSaveSettings = saveSettings
+    suspend fun saveImageAsFile(imagePath: String): SaveFileResult {
+        onBeforeSaveImage()
+        val capturedBitmap = buildBitmap()
+
+        val result = withContext(Dispatchers.IO) {
+            val file = File(imagePath)
+            try {
+                FileOutputStream(file, false).use { outputStream ->
+                    capturedBitmap.compress(
+                        saveSettings.compressFormat,
+                        saveSettings.compressQuality,
+                        outputStream
+                    )
+                    outputStream.flush()
+                }
+
+                SaveFileResult.Success
+            } catch (e: IOException) {
+                SaveFileResult.Failure(e)
+            }
+        }
+
+        if (result is SaveFileResult.Success) {
+            // Clear all views if it's enabled in save settings
+            if (saveSettings.isClearViewsEnabled) {
+                boxHelper.clearAllViews(drawingView)
+            }
+        }
+
+        return result
     }
 
-    override fun onPreExecute() {
-        super.onPreExecute()
-        mBoxHelper.clearHelperBox()
-        mDrawingView?.destroyDrawingCache()
-    }
-
-    @SuppressLint("MissingPermission")
-    override fun doInBackground(vararg inputs: String?): SaveResult {
-        // Create a media file name
-        return if (inputs.isEmpty()) {
-            saveImageAsBitmap()
+    private fun buildBitmap(): Bitmap {
+        return if (saveSettings.isTransparencyEnabled) {
+            removeTransparency(captureView(photoEditorView))
         } else {
-            saveImageInFile(inputs.first().toString())
+            captureView(photoEditorView)
         }
     }
 
