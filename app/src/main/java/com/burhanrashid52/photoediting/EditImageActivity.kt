@@ -50,16 +50,6 @@ import ja.burhanrashid52.photoeditor.shape.ShapeType
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
-import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.RecyclerView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.core.content.FileProvider
-import androidx.core.content.ContextCompat
-import androidx.transition.ChangeBounds
-import androidx.transition.TransitionManager
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class EditImageActivity : BaseActivity(), OnPhotoEditorListener, View.OnClickListener,
     PropertiesBSFragment.Properties, ShapeBSFragment.Properties, EmojiListener, StickerListener,
@@ -121,13 +111,12 @@ class EditImageActivity : BaseActivity(), OnPhotoEditorListener, View.OnClickLis
         //Typeface mTextRobotoTf = ResourcesCompat.getFont(this, R.font.roboto_medium);
         //Typeface mEmojiTypeFace = Typeface.createFromAsset(getAssets(), "emojione-android.ttf");
 
-        mPhotoEditor = mPhotoEditorView?.run {
-            PhotoEditor.Builder(this@EditImageActivity, this)
-                .setPinchTextScalable(pinchTextScalable) // set flag to make text scalable when pinch
-                //.setDefaultTextTypeface(mTextRobotoTf)
-                //.setDefaultEmojiTypeface(mEmojiTypeFace)
-                .build() // build photo editor sdk
-        }
+        mPhotoEditor = PhotoEditor.Builder(this, mPhotoEditorView)
+            .setPinchTextScalable(pinchTextScalable) // set flag to make text scalable when pinch
+            //.setDefaultTextTypeface(mTextRobotoTf)
+            //.setDefaultEmojiTypeface(mEmojiTypeFace)
+            .build() // build photo editor sdk
+
         mPhotoEditor.setOnPhotoEditorListener(this)
 
         //Set Image Dynamically
@@ -270,8 +259,6 @@ class EditImageActivity : BaseActivity(), OnPhotoEditorListener, View.OnClickLis
     }
 
     private fun shareImage() {
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = "image/*"
         val saveImageUri = mSaveImageUri
         if (saveImageUri == null) {
             showSnackbar(getString(R.string.msg_save_image_to_share))

@@ -54,7 +54,7 @@ internal class Text(
         }
     }
 
-    override fun updateView(view: View?) {
+    override fun updateView(view: View) {
         val textInput = mTextView?.text.toString()
         val currentTextColor = mTextView?.currentTextColor ?: 0
         val photoEditorListener = mGraphicManager.onPhotoEditorListener

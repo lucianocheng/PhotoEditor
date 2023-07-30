@@ -49,7 +49,7 @@ internal class ImageFilterView @JvmOverloads constructor(
     private var mCurrentEffect: PhotoFilter = PhotoFilter.NONE
     private var mSourceBitmap: Bitmap? = null
     private var mCustomEffect: CustomEffect? = null
-    private var mOnSaveBitmap: OnSaveBitmap? = null
+//    private var mOnSaveBitmap: OnSaveBitmap? = null
     private var isSaveImage = false
     private var bitmapReadyContinuation: Continuation<Bitmap>? = null
     private val mutex = Mutex()
@@ -93,7 +93,7 @@ internal class ImageFilterView @JvmOverloads constructor(
                 val mFilterBitmap = createBitmapFromGLSurface(this, gl)
                 Log.e(TAG, "onDrawFrame: $mFilterBitmap")
                 isSaveImage = false
-                Handler(Looper.getMainLooper()).post { mOnSaveBitmap?.onBitmapReady(mFilterBitmap) }
+//                Handler(Looper.getMainLooper()).post { mOnSaveBitmap?.onBitmapReady(mFilterBitmap) }
             }
         } catch (t: Throwable) {
             val continuation = bitmapReadyContinuation
@@ -120,7 +120,7 @@ internal class ImageFilterView @JvmOverloads constructor(
         }
     }
 
-    fun setFilterEffect(effect: PhotoFilter?) {
+    fun setFilterEffect(effect: PhotoFilter) {
         mCurrentEffect = effect
         mCustomEffect = null
         requestRender()
@@ -133,7 +133,7 @@ internal class ImageFilterView @JvmOverloads constructor(
 
     internal suspend fun saveBitmap(): Bitmap = mutex.withLock {
         suspendCoroutine { continuation ->
-            mOnSaveBitmap = onSaveBitmap
+//            mOnSaveBitmap = onSaveBitmap
             isSaveImage = true
             bitmapReadyContinuation = continuation
             requestRender()

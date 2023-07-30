@@ -11,9 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.burhanrashid52.photoediting.ColorPickerAdapter.OnColorPickerClickListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import ja.burhanrashid52.photoeditor.shape.ShapeType
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.LinearLayoutManager
 
 class ShapeBSFragment : BottomSheetDialogFragment(), SeekBar.OnSeekBarChangeListener {
     private var mProperties: Properties? = null
@@ -22,7 +19,7 @@ class ShapeBSFragment : BottomSheetDialogFragment(), SeekBar.OnSeekBarChangeList
         fun onColorChanged(colorCode: Int)
         fun onOpacityChanged(opacity: Int)
         fun onShapeSizeChanged(shapeSize: Int)
-        fun onShapePicked(shapeType: ShapeType?)
+        fun onShapePicked(shapeType: ShapeType)
     }
 
     override fun onCreateView(

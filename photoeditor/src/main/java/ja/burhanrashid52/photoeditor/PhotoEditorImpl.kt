@@ -18,18 +18,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.graphics.Bitmap
-import android.graphics.Typeface
-import android.text.TextUtils
 import android.util.Log
-import android.view.View
-import android.widget.ImageView
 import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.annotation.IntRange
-import androidx.annotation.RequiresPermission
 import ja.burhanrashid52.photoeditor.PhotoEditor.OnSaveListener
-import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 
 /**
  *
@@ -343,11 +334,11 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
         }
     }
 
-    override fun setFilterEffect(customEffect: CustomEffect?) {
+    override fun setFilterEffect(customEffect: CustomEffect) {
         photoEditorView.setFilterEffect(customEffect)
     }
 
-    override fun setFilterEffect(filterType: PhotoFilter?) {
+    override fun setFilterEffect(filterType: PhotoFilter) {
         photoEditorView.setFilterEffect(filterType)
     }
 
@@ -363,7 +354,7 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
 
     override suspend fun saveAsBitmap(
         saveSettings: SaveSettings
-    ): Bitmap = withContext(Dispatchers.Main) {
+    ): Bitmap? = withContext(Dispatchers.Main) {
         photoEditorView.saveFilter()
         val photoSaverTask = PhotoSaverTask(photoEditorView, mBoxHelper, saveSettings)
         return@withContext photoSaverTask.saveImageAsBitmap()
@@ -399,24 +390,24 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
         saveAsBitmap(SaveSettings.Builder().build(), onSaveBitmap)
     }
 
-    @SuppressLint("StaticFieldLeak")
-    override fun saveAsBitmap(
-        saveSettings: SaveSettings,
-        onSaveBitmap: OnSaveBitmap
-    ) {
-        photoEditorView.saveFilter(object : OnSaveBitmap {
-            override fun onBitmapReady(saveBitmap: Bitmap?) {
-                val photoSaverTask = PhotoSaverTask(photoEditorView, mBoxHelper)
-                photoSaverTask.setOnSaveBitmap(onSaveBitmap)
-                photoSaverTask.setSaveSettings(saveSettings)
-                photoSaverTask.saveBitmap()
-            }
-
-            override fun onFailure(e: Exception?) {
-                onSaveBitmap.onFailure(e)
-            }
-        })
-    }
+//    @SuppressLint("StaticFieldLeak")
+//    override fun saveAsBitmap(
+//        saveSettings: SaveSettings,
+//        onSaveBitmap: OnSaveBitmap
+//    ) {
+//        photoEditorView.saveFilter(object : OnSaveBitmap {
+//            override fun onBitmapReady(saveBitmap: Bitmap?) {
+//                val photoSaverTask = PhotoSaverTask(photoEditorView, mBoxHelper)
+//                photoSaverTask.setOnSaveBitmap(onSaveBitmap)
+//                photoSaverTask.setSaveSettings(saveSettings)
+//                photoSaverTask.saveBitmap()
+//            }
+//
+//            override fun onFailure(e: Exception?) {
+//                onSaveBitmap.onFailure(e)
+//            }
+//        })
+//    }
 
     override fun setOnPhotoEditorListener(onPhotoEditorListener: OnPhotoEditorListener) {
         mOnPhotoEditorListener = onPhotoEditorListener
@@ -429,7 +420,7 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
         get() = viewState.addedViewsCount == 0 && viewState.redoViewsCount == 0
 
     // region Shape
-    override fun setShape(shapeBuilder: ShapeBuilder?) {
+    override fun setShape(shapeBuilder: ShapeBuilder) {
         drawingView?.currentShapeBuilder = shapeBuilder
     } // endregion
 

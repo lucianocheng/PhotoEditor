@@ -38,7 +38,7 @@ class PhotoEditorView @JvmOverloads constructor(
      *
      * @return source ImageView
      */
-    var imageOverlayView: ImageView? = null
+    var imageOverlayView: ImageView
         private set
 
     /**
@@ -47,7 +47,7 @@ class PhotoEditorView @JvmOverloads constructor(
      *
      * @return source ImageView
      */
-    var backgroundView: ImageView? = null
+    var backgroundView: ImageView
         private set
 
     /**
@@ -56,9 +56,9 @@ class PhotoEditorView @JvmOverloads constructor(
      *
      * @return source RelativeLayout
      */
-    var parentLayout: RelativeLayout? = null
+    lateinit var parentLayout: RelativeLayout
         private set
-    var canvasLayout: RelativeLayout? = null
+    lateinit var canvasLayout: RelativeLayout
         private set
 
     init {
@@ -201,36 +201,32 @@ class PhotoEditorView @JvmOverloads constructor(
      *
      * @return source ImageView
      */
-    val source: ImageView?
+    val source: ImageView
         get() = mImgSource
 
-    fun resetSourceImageSettings() {
-        // NOTE(kleyow): Need to reset image after changing the main image because Zooming changes
-        //               the settings.
-        mImgSource!!.adjustViewBounds = true
-        mImgSource!!.scaleType = ImageView.ScaleType.FIT_CENTER
-    }
+//    fun resetSourceImageSettings() {
+//        // NOTE(kleyow): Need to reset image after changing the main image because Zooming changes
+//        //               the settings.
+//        mImgSource!!.adjustViewBounds = true
+//        mImgSource!!.scaleType = ImageView.ScaleType.FIT_CENTER
+//    }
 
-    fun saveFilter(onSaveBitmap: OnSaveBitmap) {
-        if (mImageFilterView!!.visibility == VISIBLE) {
-            mImageFilterView!!.saveBitmap(object : OnSaveBitmap {
-                override fun onBitmapReady(saveBitmap: Bitmap?) {
-                    Log.e(TAG, "saveFilter: $saveBitmap")
-                    mImgSource!!.setImageBitmap(saveBitmap!!)
-                    mImageFilterView!!.visibility = GONE
-                    onSaveBitmap.onBitmapReady(saveBitmap)
-                }
-
-                override fun onFailure(e: Exception?) {
-                    onSaveBitmap.onFailure(e)
-                }
-            })
+    suspend fun saveFilter(): Bitmap {
+        return if (mImageFilterView.visibility == VISIBLE) {
+            val saveBitmap = try {
+                mImageFilterView.saveBitmap()
+            } catch (t: Throwable) {
+                throw RuntimeException("Couldn't save bitmap with filter", t)
+            }
+            mImgSource.setImageBitmap(saveBitmap)
+            mImageFilterView.visibility = GONE
+            saveBitmap
         } else {
-            onSaveBitmap.onBitmapReady(mImgSource!!.bitmap)
+            mImgSource.bitmap!!
         }
     }
 
-    fun setFilterEffect(filterType: PhotoFilter?) {
+    fun setFilterEffect(filterType: PhotoFilter) {
         mImageFilterView.visibility = VISIBLE
         mImageFilterView.setSourceBitmap(mImgSource.bitmap)
         mImageFilterView.setFilterEffect(filterType)

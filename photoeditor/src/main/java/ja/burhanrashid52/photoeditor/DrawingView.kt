@@ -35,7 +35,7 @@ class DrawingView @JvmOverloads constructor(
     var isDrawingEnabled = false
         private set
     private var viewChangeListener: BrushViewChangeListener? = null
-    var currentShapeBuilder: ShapeBuilder? = null
+    var currentShapeBuilder: ShapeBuilder
 
     // eraser parameters
     private var isErasing = false
@@ -138,7 +138,7 @@ class DrawingView @JvmOverloads constructor(
         if (isErasing) {
             paint = createEraserPaint()
         } else {
-            when (val shapeType = currentShapeBuilder?.shapeType) {
+            when (val shapeType = currentShapeBuilder.shapeType) {
                 ShapeType.Oval -> {
                     shape = OvalShape()
                 }

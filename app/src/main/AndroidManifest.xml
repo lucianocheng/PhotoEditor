@@ -22,7 +22,6 @@
         tools:replace="android:allowBackup">
         <activity
             android:name="com.burhanrashid52.photoediting.EditImageActivity"
-            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="true">

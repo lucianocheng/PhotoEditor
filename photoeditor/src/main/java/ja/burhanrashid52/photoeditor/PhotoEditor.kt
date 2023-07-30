@@ -211,14 +211,14 @@ interface PhotoEditor {
      *
      * @param customEffect [CustomEffect.Builder.setParameter]
      */
-    fun setFilterEffect(customEffect: CustomEffect?)
+    fun setFilterEffect(customEffect: CustomEffect)
 
     /**
      * Set pre-define filter available
      *
      * @param filterType type of filter want to apply [PhotoEditorImpl]
      */
-    fun setFilterEffect(filterType: PhotoFilter?)
+    fun setFilterEffect(filterType: PhotoFilter)
 
     /**
      * Save the edited image on given path
@@ -240,7 +240,7 @@ interface PhotoEditor {
      *
      * @param saveSettings builder for multiple save options [SaveSettings]
      */
-    suspend fun saveAsBitmap(saveSettings: SaveSettings = SaveSettings.Builder().build()): Bitmap
+    suspend fun saveAsBitmap(saveSettings: SaveSettings = SaveSettings.Builder().build()): Bitmap?
 
     fun saveAsFile(imagePath: String, saveSettings: SaveSettings, onSaveListener: OnSaveListener)
 
@@ -398,5 +398,5 @@ interface PhotoEditor {
      * Update the current shape to be drawn,
      * through the use of a ShapeBuilder.
      */
-    fun setShape(shapeBuilder: ShapeBuilder?) // endregion
+    fun setShape(shapeBuilder: ShapeBuilder) // endregion
 }
