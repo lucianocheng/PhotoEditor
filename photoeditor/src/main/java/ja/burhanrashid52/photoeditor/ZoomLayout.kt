@@ -35,10 +35,7 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
     private var dy = 0f
     private var prevDx = 0f
     private var prevDy = 0f
-    var mainImageLockValue = false
-public get() {
-        return editorView.lockedZoom
-    }
+    var lockedZoom = false
 
     constructor(context: Context) : super(context) {
         init(context)

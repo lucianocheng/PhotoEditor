@@ -13,7 +13,6 @@ import android.widget.TextView
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresPermission
 import ja.burhanrashid52.photoeditor.PhotoEditor.OnSaveListener
-import ja.burhanrashid52.photoeditor.ZoomLayout.lockedZoom
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 
 /**
@@ -29,7 +28,7 @@ import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
  */
 class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") constructor(builder: PhotoEditor.Builder) :
     PhotoEditor {
-    private val editorView: PhotoEditorView?
+    private val editorView: PhotoEditorView
     override val viewState: PhotoEditorViewState
     private val mainImageView: ImageView?
     private val deleteView: View?
@@ -247,7 +246,7 @@ class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") constructor(bu
     override var brushSize: Float
         get() = if (drawingView != null && drawingView.currentShapeBuilder != null) {
             drawingView.currentShapeBuilder!!.shapeSize
-        } else 0
+        } else 0f
         set(size) {
             if (drawingView != null && drawingView.currentShapeBuilder != null) {
                 drawingView.currentShapeBuilder!!.withShapeSize(size)
@@ -270,7 +269,7 @@ class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") constructor(bu
     }
 
     override val eraserSize: Float
-        get() = drawingView?.eraserSize ?: 0
+        get() = drawingView?.eraserSize ?: 0f
 
     override fun brushEraser() {
         drawingView?.brushEraser()
@@ -343,6 +342,9 @@ class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") constructor(bu
     override fun unfocusView() {
         clearHelperBox()
     }
+
+    override val mainImageLockValue: Boolean
+        get() = editorView.lockedZoom
 
     override fun clearAllViews() {
         mBoxHelper.clearAllViews(drawingView)

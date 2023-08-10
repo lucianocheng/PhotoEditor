@@ -54,9 +54,9 @@ class PhotoEditorView : ZoomLayout {
      *
      * @return source RelativeLayout
      */
-    var parentLayout: RelativeLayout? = null
+    lateinit var parentLayout: RelativeLayout
         private set
-    var canvasLayout: RelativeLayout? = null
+    lateinit var canvasLayout: RelativeLayout
         private set
 
     constructor(context: Context?) : super(context!!) {
