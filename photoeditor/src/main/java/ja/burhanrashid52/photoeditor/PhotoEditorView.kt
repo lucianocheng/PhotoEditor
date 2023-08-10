@@ -1,218 +1,30 @@
-package ja.burhanrashid52.photoeditor;
+package ja.burhanrashid52.photoeditor
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
+import android.os.Build
+import android.util.AttributeSet
+import android.util.Log
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import androidx.annotation.RequiresApi
+import ja.burhanrashid52.photoeditor.FilterImageView.OnImageChangedListener
 
 /**
- * <p>
- * This ViewGroup will have the {@link DrawingView} to draw paint on it with {@link ImageView}
- * which our source image
- * </p>
  *
- * @author <a href="https://github.com/burhanrashid52">Burhanuddin Rashid</a>
+ *
+ * This ViewGroup will have the [DrawingView] to draw paint on it with [ImageView]
+ * which our source image
+ *
+ *
+ * @author [Burhanuddin Rashid](https://github.com/burhanrashid52)
  * @version 0.1.1
  * @since 1/18/2018
  */
-
-public class PhotoEditorView extends ZoomLayout {
-
-    private static final String TAG = "PhotoEditorView";
-
-    private FilterImageView mImgSource;
-    private ImageView mImageOverlay, mImageBackground;
-    private DrawingView mDrawingView;
-    private ImageFilterView mImageFilterView;
-    private boolean clipSourceImage;
-    private RelativeLayout mParentLayout, mCanvasLayout;
-    private static final int imgSrcId = 1, shapeSrcId = 2, glFilterId = 3, imgOverlayId = 4, imgBackgroundId = 5, parentLayoutId = 6;
-
-    public PhotoEditorView(Context context) {
-        super(context);
-        init(null);
-    }
-
-    public PhotoEditorView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(attrs);
-    }
-
-    public PhotoEditorView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(attrs);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public PhotoEditorView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        init(attrs);
-    }
-
-    private void init(@Nullable AttributeSet attrs) {
-        //Setup image attributes
-        mImgSource = new FilterImageView(getContext());
-        RelativeLayout.LayoutParams sourceParam = setupImageSource(attrs);
-
-        mImgSource.setOnImageChangedListener(new FilterImageView.OnImageChangedListener() {
-            @Override
-            public void onBitmapLoaded(@Nullable Bitmap sourceBitmap) {
-                mImageFilterView.setFilterEffect(PhotoFilter.NONE);
-                mImageFilterView.setSourceBitmap(sourceBitmap);
-                Log.d(TAG, "onBitmapLoaded() called with: sourceBitmap = [" + sourceBitmap + "]");
-            }
-        });
-
-        //Setup GLSurface attributes
-        mImageFilterView = new ImageFilterView(getContext());
-        RelativeLayout.LayoutParams filterParam = setupFilterView();
-
-        //Setup drawing view
-        mDrawingView = new DrawingView(getContext());
-        RelativeLayout.LayoutParams brushParam = setupDrawingView();
-
-        // NOTE(kleyow): This is custom added code diverging from https://github.com/burhanrashid52/PhotoEditor
-        mImageOverlay = new ImageView(getContext());
-        mImageOverlay.setId(imgOverlayId);
-        RelativeLayout.LayoutParams imgOverlayParam = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-        // NOTE(kleyow): This is custom added code diverging from https://github.com/burhanrashid52/PhotoEditor
-        // TODO(kleyow): Need to add logic to handle when the image is square.
-        mImageBackground = new ImageView(getContext());
-        mImageBackground.setScaleType(ImageView.ScaleType.FIT_XY);
-        mImageBackground.setId(imgBackgroundId);
-        RelativeLayout.LayoutParams imgBackgroundParam = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-        // NOTE(kleyow): Order of addition of views is important.
-        // Add background view
-        mCanvasLayout.addView(mImageBackground, imgBackgroundParam);
-
-        //Add image source
-        mCanvasLayout.addView(mImgSource, sourceParam);
-
-        //Add Gl FilterView
-        mCanvasLayout.addView(mImageFilterView, filterParam);
-
-        //Add brush view
-        mCanvasLayout.addView(mDrawingView, brushParam);
-
-        mParentLayout.addView(mCanvasLayout);
-
-        // Add overlay view
-        addView(mImageOverlay, imgOverlayParam);
-    }
-
-
-    @SuppressLint("Recycle")
-    private RelativeLayout.LayoutParams setupImageSource(@Nullable AttributeSet attrs) {
-        mImgSource.setId(imgSrcId);
-        mImgSource.setAdjustViewBounds(true);
-        mImgSource.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        RelativeLayout.LayoutParams imgSrcParam = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-        imgSrcParam.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-        if (attrs != null) {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PhotoEditorView);
-            Drawable imgSrcDrawable = a.getDrawable(R.styleable.PhotoEditorView_photo_src);
-            if (imgSrcDrawable != null) {
-                mImgSource.setImageDrawable(imgSrcDrawable);
-            }
-        }
-
-        int widthParam = ViewGroup.LayoutParams.MATCH_PARENT;
-        if (clipSourceImage) {
-            widthParam = ViewGroup.LayoutParams.WRAP_CONTENT;
-        }
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                widthParam, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-
-        return params;
-    }
-
-
-    private RelativeLayout.LayoutParams setupDrawingView() {
-        mDrawingView.setVisibility(GONE);
-        mDrawingView.setId(shapeSrcId);
-
-        // Align drawing view to the size of image view
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-        params.addRule(RelativeLayout.ALIGN_TOP, imgSrcId);
-        params.addRule(RelativeLayout.ALIGN_BOTTOM, imgSrcId);
-        params.addRule(RelativeLayout.ALIGN_LEFT, imgSrcId);
-        params.addRule(RelativeLayout.ALIGN_RIGHT, imgSrcId);
-        return params;
-    }
-
-
-    private RelativeLayout.LayoutParams setupFilterView() {
-        mImageFilterView.setVisibility(GONE);
-        mImageFilterView.setId(glFilterId);
-
-        //Align brush to the size of image view
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-        params.addRule(RelativeLayout.ALIGN_TOP, imgSrcId);
-        params.addRule(RelativeLayout.ALIGN_BOTTOM, imgSrcId);
-
-        // NOTE(kleyow): This is custom added code diverging from https://github.com/burhanrashid52/PhotoEditor
-        mParentLayout = new RelativeLayout(getContext());
-        mParentLayout.setId(parentLayoutId);
-        RelativeLayout.LayoutParams parentLayoutParam = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-        // `ZoomLayout` must have only one child, so this will be the container for all sub-views.
-        addView(mParentLayout, parentLayoutParam);
-
-
-        // NOTE(kleyow): Seperate the view into layers so functionality is not fighting over a
-        //               view's pivot. Better seperation of layouts here could be an improvement.
-        mCanvasLayout = new RelativeLayout(getContext());
-        mCanvasLayout.setId(parentLayoutId);
-        RelativeLayout.LayoutParams rotateLayoutParam = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-        return params;
-    }
-
-
-    /**
-     * Source image which you want to edit
-     *
-     * @return source ImageView
-     */
-    public ImageView getSource() {
-        return mImgSource;
-    }
-
-    public void resetSourceImageSettings() {
-        // NOTE(kleyow): Need to reset image after changing the main image because Zooming changes
-        //               the settings.
-        mImgSource.setAdjustViewBounds(true);
-        mImgSource.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-    }
-
-    DrawingView getDrawingView() {
-        return mDrawingView;
-    }
+class PhotoEditorView : ZoomLayout {
+    private var mImgSource: FilterImageView? = null
 
     /**
      * Overlay view which you want to edit
@@ -220,9 +32,8 @@ public class PhotoEditorView extends ZoomLayout {
      *
      * @return source ImageView
      */
-    public ImageView getImageOverlayView() {
-        return mImageOverlay;
-    }
+    var imageOverlayView: ImageView? = null
+        private set
 
     /**
      * Background view which you want to edit
@@ -230,9 +41,12 @@ public class PhotoEditorView extends ZoomLayout {
      *
      * @return source ImageView
      */
-    public ImageView getBackgroundView() {
-        return mImageBackground;
-    }
+    var backgroundView: ImageView? = null
+        private set
+    var drawingView: DrawingView? = null
+        private set
+    private var mImageFilterView: ImageFilterView? = null
+    private var clipSourceImage = false
 
     /**
      * Parent layout which holds all sub views
@@ -240,53 +54,228 @@ public class PhotoEditorView extends ZoomLayout {
      *
      * @return source RelativeLayout
      */
-    public RelativeLayout getParentLayout() {
-        return mParentLayout;
+    var parentLayout: RelativeLayout? = null
+        private set
+    var canvasLayout: RelativeLayout? = null
+        private set
+
+    constructor(context: Context?) : super(context!!) {
+        init(null)
     }
 
-    public RelativeLayout getCanvasLayout() {
-        return mCanvasLayout;
+    constructor(context: Context?, attrs: AttributeSet?) : super(
+        context!!, attrs
+    ) {
+        init(attrs)
     }
 
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context!!, attrs, defStyleAttr
+    ) {
+        init(attrs)
+    }
 
-    void saveFilter(@NonNull final OnSaveBitmap onSaveBitmap) {
-        if (mImageFilterView.getVisibility() == VISIBLE) {
-            mImageFilterView.saveBitmap(new OnSaveBitmap() {
-                @Override
-                public void onBitmapReady(final Bitmap saveBitmap) {
-                    Log.e(TAG, "saveFilter: " + saveBitmap);
-                    mImgSource.setImageBitmap(saveBitmap);
-                    mImageFilterView.setVisibility(GONE);
-                    onSaveBitmap.onBitmapReady(saveBitmap);
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    constructor(
+        context: Context?,
+        attrs: AttributeSet?,
+        defStyleAttr: Int,
+        defStyleRes: Int
+    ) : super(
+        context!!, attrs, defStyleAttr, defStyleRes
+    ) {
+        init(attrs)
+    }
+
+    private fun init(attrs: AttributeSet?) {
+        //Setup image attributes
+        mImgSource = FilterImageView(context)
+        val sourceParam = setupImageSource(attrs)
+        mImgSource!!.setOnImageChangedListener(object : OnImageChangedListener {
+            override fun onBitmapLoaded(sourceBitmap: Bitmap?) {
+                mImageFilterView!!.setFilterEffect(PhotoFilter.NONE)
+                mImageFilterView!!.setSourceBitmap(sourceBitmap)
+                Log.d(TAG, "onBitmapLoaded() called with: sourceBitmap = [$sourceBitmap]")
+            }
+        })
+
+        //Setup GLSurface attributes
+        mImageFilterView = ImageFilterView(context)
+        val filterParam = setupFilterView()
+
+        //Setup drawing view
+        drawingView = DrawingView(context)
+        val brushParam = setupDrawingView()
+
+        // NOTE(kleyow): This is custom added code diverging from https://github.com/burhanrashid52/PhotoEditor
+        imageOverlayView = ImageView(context)
+        imageOverlayView!!.id = imgOverlayId
+        val imgOverlayParam = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        // NOTE(kleyow): This is custom added code diverging from https://github.com/burhanrashid52/PhotoEditor
+        // TODO(kleyow): Need to add logic to handle when the image is square.
+        backgroundView = ImageView(context)
+        backgroundView!!.scaleType = ImageView.ScaleType.FIT_XY
+        backgroundView!!.id = imgBackgroundId
+        val imgBackgroundParam = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        // NOTE(kleyow): Order of addition of views is important.
+        // Add background view
+        canvasLayout!!.addView(backgroundView, imgBackgroundParam)
+
+        //Add image source
+        canvasLayout!!.addView(mImgSource, sourceParam)
+
+        //Add Gl FilterView
+        canvasLayout!!.addView(mImageFilterView, filterParam)
+
+        //Add brush view
+        canvasLayout!!.addView(drawingView, brushParam)
+        parentLayout!!.addView(canvasLayout)
+
+        // Add overlay view
+        addView(imageOverlayView, imgOverlayParam)
+    }
+
+    @SuppressLint("Recycle")
+    private fun setupImageSource(attrs: AttributeSet?): RelativeLayout.LayoutParams {
+        mImgSource!!.id = imgSrcId
+        mImgSource!!.adjustViewBounds = true
+        mImgSource!!.scaleType = ImageView.ScaleType.FIT_CENTER
+        val imgSrcParam = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        imgSrcParam.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE)
+        if (attrs != null) {
+            val a = context.obtainStyledAttributes(attrs, R.styleable.PhotoEditorView)
+            val imgSrcDrawable = a.getDrawable(R.styleable.PhotoEditorView_photo_src)
+            if (imgSrcDrawable != null) {
+                mImgSource!!.setImageDrawable(imgSrcDrawable)
+            }
+        }
+        var widthParam = ViewGroup.LayoutParams.MATCH_PARENT
+        if (clipSourceImage) {
+            widthParam = ViewGroup.LayoutParams.WRAP_CONTENT
+        }
+        val params = RelativeLayout.LayoutParams(
+            widthParam, ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE)
+        return params
+    }
+
+    private fun setupDrawingView(): RelativeLayout.LayoutParams {
+        drawingView!!.visibility = GONE
+        drawingView!!.id = shapeSrcId
+
+        // Align drawing view to the size of image view
+        val params = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE)
+        params.addRule(RelativeLayout.ALIGN_TOP, imgSrcId)
+        params.addRule(RelativeLayout.ALIGN_BOTTOM, imgSrcId)
+        params.addRule(RelativeLayout.ALIGN_LEFT, imgSrcId)
+        params.addRule(RelativeLayout.ALIGN_RIGHT, imgSrcId)
+        return params
+    }
+
+    private fun setupFilterView(): RelativeLayout.LayoutParams {
+        mImageFilterView!!.visibility = GONE
+        mImageFilterView!!.id = glFilterId
+
+        //Align brush to the size of image view
+        val params = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE)
+        params.addRule(RelativeLayout.ALIGN_TOP, imgSrcId)
+        params.addRule(RelativeLayout.ALIGN_BOTTOM, imgSrcId)
+
+        // NOTE(kleyow): This is custom added code diverging from https://github.com/burhanrashid52/PhotoEditor
+        parentLayout = RelativeLayout(context)
+        parentLayout!!.id = parentLayoutId
+        val parentLayoutParam = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+        )
+
+        // `ZoomLayout` must have only one child, so this will be the container for all sub-views.
+        addView(parentLayout, parentLayoutParam)
+
+
+        // NOTE(kleyow): Seperate the view into layers so functionality is not fighting over a
+        //               view's pivot. Better seperation of layouts here could be an improvement.
+        canvasLayout = RelativeLayout(context)
+        canvasLayout!!.id = parentLayoutId
+        val rotateLayoutParam = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        return params
+    }
+
+    /**
+     * Source image which you want to edit
+     *
+     * @return source ImageView
+     */
+    val source: ImageView?
+        get() = mImgSource
+
+    fun resetSourceImageSettings() {
+        // NOTE(kleyow): Need to reset image after changing the main image because Zooming changes
+        //               the settings.
+        mImgSource!!.adjustViewBounds = true
+        mImgSource!!.scaleType = ImageView.ScaleType.FIT_CENTER
+    }
+
+    fun saveFilter(onSaveBitmap: OnSaveBitmap) {
+        if (mImageFilterView!!.visibility == VISIBLE) {
+            mImageFilterView!!.saveBitmap(object : OnSaveBitmap {
+                override fun onBitmapReady(saveBitmap: Bitmap?) {
+                    Log.e(TAG, "saveFilter: $saveBitmap")
+                    mImgSource!!.setImageBitmap(saveBitmap!!)
+                    mImageFilterView!!.visibility = GONE
+                    onSaveBitmap.onBitmapReady(saveBitmap)
                 }
 
-                @Override
-                public void onFailure(Exception e) {
-                    onSaveBitmap.onFailure(e);
+                override fun onFailure(e: Exception?) {
+                    onSaveBitmap.onFailure(e)
                 }
-            });
+            })
         } else {
-            onSaveBitmap.onBitmapReady(mImgSource.getBitmap());
+            onSaveBitmap.onBitmapReady(mImgSource!!.bitmap)
         }
     }
 
-    void setFilterEffect(PhotoFilter filterType) {
-        mImageFilterView.setVisibility(VISIBLE);
-        mImageFilterView.setSourceBitmap(mImgSource.getBitmap());
-        mImageFilterView.setFilterEffect(filterType);
+    fun setFilterEffect(filterType: PhotoFilter?) {
+        mImageFilterView!!.visibility = VISIBLE
+        mImageFilterView!!.setSourceBitmap(mImgSource!!.bitmap)
+        mImageFilterView!!.setFilterEffect(filterType)
     }
 
-    void setFilterEffect(CustomEffect customEffect) {
-        mImageFilterView.setVisibility(VISIBLE);
-        mImageFilterView.setSourceBitmap(mImgSource.getBitmap());
-        mImageFilterView.setFilterEffect(customEffect);
+    fun setFilterEffect(customEffect: CustomEffect?) {
+        mImageFilterView!!.visibility = VISIBLE
+        mImageFilterView!!.setSourceBitmap(mImgSource!!.bitmap)
+        mImageFilterView!!.setFilterEffect(customEffect)
     }
 
-    void setClipSourceImage(boolean clip) {
-        clipSourceImage = clip;
-        RelativeLayout.LayoutParams param = setupImageSource(null);
-        mImgSource.setLayoutParams(param);
-    }
+    fun setClipSourceImage(clip: Boolean) {
+        clipSourceImage = clip
+        val param = setupImageSource(null)
+        mImgSource!!.layoutParams = param
+    } // endregion
 
-    // endregion
+    companion object {
+        private const val TAG = "PhotoEditorView"
+        private const val imgSrcId = 1
+        private const val shapeSrcId = 2
+        private const val glFilterId = 3
+        private const val imgOverlayId = 4
+        private const val imgBackgroundId = 5
+        private const val parentLayoutId = 6
+    }
 }

@@ -1,229 +1,226 @@
-package ja.burhanrashid52.photoeditor;
+package ja.burhanrashid52.photoeditor
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Typeface;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import androidx.annotation.ColorInt;
-import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresPermission;
-import androidx.annotation.UiThread;
-
-import ja.burhanrashid52.photoeditor.shape.ShapeBuilder;
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Typeface
+import android.view.View
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import android.widget.TextView
+import androidx.annotation.IntRange
+import androidx.annotation.RequiresPermission
+import androidx.annotation.UiThread
+import ja.burhanrashid52.photoeditor.PhotoEditorView
+import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 
 /**
  * Created by Burhanuddin Rashid on 14/05/21.
  *
- * @author <https://github.com/burhanrashid52>
+ * @author <https:></https:>//github.com/burhanrashid52>
  */
-public interface PhotoEditor {
+interface PhotoEditor {
     /**
-     * This will add image on {@link PhotoEditorView} which you drag,rotate and scale using pinch
-     * if {@link PhotoEditor.Builder#setPinchTextScalable(boolean)} enabled
+     * This will add image on [PhotoEditorView] which you drag,rotate and scale using pinch
+     * if [PhotoEditor.Builder.setPinchTextScalable] enabled
      *
      * @param desiredImage bitmap image you want to add
      */
-    View addImage(Bitmap desiredImage);
+    fun addImage(desiredImage: Bitmap?): View?
 
     /**
-     * This add the text on the {@link PhotoEditorView} with provided parameters
-     * by default {@link TextView#setText(int)} will be 18sp
+     * This add the text on the [PhotoEditorView] with provided parameters
+     * by default [TextView.setText] will be 18sp
      *
      * @param text              text to display
      * @param colorCodeTextView text color to be displayed
      */
     @SuppressLint("ClickableViewAccessibility")
-    View addText(String text, int colorCodeTextView);
+    fun addText(text: String?, colorCodeTextView: Int): View
 
     /**
-     * This add the text on the {@link PhotoEditorView} with provided parameters
-     * by default {@link TextView#setText(int)} will be 18sp
+     * This add the text on the [PhotoEditorView] with provided parameters
+     * by default [TextView.setText] will be 18sp
      *
      * @param textTypeface      typeface for custom font in the text
      * @param text              text to display
      * @param colorCodeTextView text color to be displayed
      */
     @SuppressLint("ClickableViewAccessibility")
-    View addText(@Nullable Typeface textTypeface, String text, int colorCodeTextView);
+    fun addText(textTypeface: Typeface?, text: String?, colorCodeTextView: Int): View
 
     /**
-     * This add the text on the {@link PhotoEditorView} with provided parameters
-     * by default {@link TextView#setText(int)} will be 18sp
+     * This add the text on the [PhotoEditorView] with provided parameters
+     * by default [TextView.setText] will be 18sp
      *
      * @param text         text to display
      * @param styleBuilder text style builder with your style
      */
     @SuppressLint("ClickableViewAccessibility")
-    View addText(String text, @Nullable TextStyleBuilder styleBuilder);
+    fun addText(text: String?, styleBuilder: TextStyleBuilder?): View
 
     /**
      * This will update text and color on provided view
      *
      * @param view      view on which you want update
-     * @param inputText text to update {@link TextView}
-     * @param colorCode color to update on {@link TextView}
+     * @param inputText text to update [TextView]
+     * @param colorCode color to update on [TextView]
      */
-    void editText(@NonNull View view, String inputText, int colorCode);
+    fun editText(view: View, inputText: String?, colorCode: Int)
 
     /**
      * This will update the text and color on provided view
      *
      * @param view         root view where text view is a child
      * @param textTypeface update typeface for custom font in the text
-     * @param inputText    text to update {@link TextView}
-     * @param colorCode    color to update on {@link TextView}
+     * @param inputText    text to update [TextView]
+     * @param colorCode    color to update on [TextView]
      */
-    void editText(@NonNull View view, @Nullable Typeface textTypeface, String inputText, int colorCode);
+    fun editText(view: View, textTypeface: Typeface?, inputText: String?, colorCode: Int)
 
     /**
      * This will update the text and color on provided view
      *
      * @param view         root view where text view is a child
-     * @param inputText    text to update {@link TextView}
-     * @param styleBuilder style to apply on {@link TextView}
+     * @param inputText    text to update [TextView]
+     * @param styleBuilder style to apply on [TextView]
      */
-    void editText(@NonNull View view, String inputText, @Nullable TextStyleBuilder styleBuilder);
+    fun editText(view: View, inputText: String?, styleBuilder: TextStyleBuilder?)
 
     /**
-     * Adds emoji to the {@link PhotoEditorView} which you drag,rotate and scale using pinch
-     * if {@link PhotoEditorImpl.Builder#setPinchTextScalable(boolean)} enabled
+     * Adds emoji to the [PhotoEditorView] which you drag,rotate and scale using pinch
+     * if [PhotoEditorImpl.Builder.setPinchTextScalable] enabled
      *
      * @param emojiName unicode in form of string to display emoji
      */
-    View addEmoji(String emojiName);
+    fun addEmoji(emojiName: String?): View
 
     /**
-     * Adds emoji to the {@link PhotoEditorView} which you drag,rotate and scale using pinch
-     * if {@link PhotoEditorImpl.Builder#setPinchTextScalable(boolean)} enabled
+     * Adds emoji to the [PhotoEditorView] which you drag,rotate and scale using pinch
+     * if [PhotoEditorImpl.Builder.setPinchTextScalable] enabled
      *
      * @param emojiTypeface typeface for custom font to show emoji unicode in specific font
      * @param emojiName     unicode in form of string to display emoji
      */
-    View addEmoji(Typeface emojiTypeface, String emojiName);
+    fun addEmoji(emojiTypeface: Typeface?, emojiName: String?): View
 
     /**
-     * Enable/Disable drawing mode to draw on {@link PhotoEditorView}
+     * Enable/Disable drawing mode to draw on [PhotoEditorView]
      *
      * @param brushDrawingMode true if mode is enabled
      */
-    void setBrushDrawingMode(boolean brushDrawingMode);
+    fun setBrushDrawingMode(brushDrawingMode: Boolean)
 
     /**
      * @return true is brush mode is enabled
      */
-    Boolean getBrushDrawableMode();
+    val brushDrawableMode: Boolean
 
     /**
-     * Set the size of brush user want to paint on canvas i.e {@link DrawingView}
-     * @deprecated use {@code setShape} of a ShapeBuilder
-     *
-     * @param size size of brush
-     */
-    @Deprecated
-    void setBrushSize(float size);
-
-    /**
-     * set opacity/transparency of brush while painting on {@link DrawingView}
-     * @deprecated use {@code setShape} of a ShapeBuilder
-     *
+     * set opacity/transparency of brush while painting on [DrawingView]
      * @param opacity opacity is in form of percentage
      */
-    @Deprecated
-    void setOpacity(@IntRange(from = 0, to = 100) int opacity);
-
-    /**
-     * set brush color which user want to paint
-     * @deprecated use {@code setShape} of a ShapeBuilder
-     *
-     * @param color color value for paint
-     */
-    @Deprecated
-    void setBrushColor(@ColorInt int color);
+    @Deprecated(
+        """use {@code setShape} of a ShapeBuilder
+     
+      """
+    )
+    fun setOpacity(@IntRange(from = 0, to = 100) opacity: Int)
 
     /**
      * set the eraser size
-     * <b>Note :</b> Eraser size is different from the normal brush size
+     * **Note :** Eraser size is different from the normal brush size
      *
      * @param brushEraserSize size of eraser
      */
-    void setBrushEraserSize(float brushEraserSize);
+    fun setBrushEraserSize(brushEraserSize: Float)
 
     /**
      * @return provide the size of eraser
-     * @see PhotoEditor#setBrushEraserSize(float)
+     * @see PhotoEditor.setBrushEraserSize
      */
-    float getEraserSize();
-
+    val eraserSize: Float
     /**
      * @return provide the size of eraser
-     * @see PhotoEditor#setBrushSize(float)
+     * @see PhotoEditor.setBrushSize
      */
-    float getBrushSize();
-
+    /**
+     * Set the size of brush user want to paint on canvas i.e [DrawingView]
+     * @param size size of brush
+     */
+    @set:Deprecated(
+        """use {@code setShape} of a ShapeBuilder
+     
+      """
+    )
+    var brushSize: Float
     /**
      * @return provide the size of eraser
-     * @see PhotoEditor#setBrushColor(int)
+     * @see PhotoEditor.setBrushColor
      */
-    int getBrushColor();
+    /**
+     * set brush color which user want to paint
+     * @param color color value for paint
+     */
+    @set:Deprecated(
+        """use {@code setShape} of a ShapeBuilder
+     
+      """
+    )
+    var brushColor: Int
 
     /**
-     * <p>
+     *
+     *
      * Its enables eraser mode after that whenever user drags on screen this will erase the existing
      * paint
-     * <br>
-     * <b>Note</b> : This eraser will work on paint views only
-     * <p>
+     * <br></br>
+     * **Note** : This eraser will work on paint views only
+     *
+     *
      */
-    void brushEraser();
+    fun brushEraser()
 
     /**
-     * Undo the last operation perform on the {@link PhotoEditor}
+     * Undo the last operation perform on the [PhotoEditor]
      *
      * @return true if there nothing more to undo
      */
-    boolean undo();
+    fun undo(): Boolean
 
     /**
-     * Redo the last operation perform on the {@link PhotoEditor}
+     * Redo the last operation perform on the [PhotoEditor]
      *
      * @return true if there nothing more to redo
      */
-    boolean redo();
+    fun redo(): Boolean
 
     /**
-     * Removes all the edited operations performed {@link PhotoEditorView}
+     * Removes all the edited operations performed [PhotoEditorView]
      * This will also clear the undo and redo stack
      */
-    void clearAllViews();
+    fun clearAllViews()
 
     /**
      * Remove all helper boxes from views
      */
     @UiThread
-    void clearHelperBox();
+    fun clearHelperBox()
 
     /**
      * Setup of custom effect using effect type and set parameters values
      *
-     * @param customEffect {@link CustomEffect.Builder#setParameter(String, Object)}
+     * @param customEffect [CustomEffect.Builder.setParameter]
      */
-    void setFilterEffect(CustomEffect customEffect);
-
+    fun setFilterEffect(customEffect: CustomEffect?)
 
     /**
      * Set pre-define filter available
      *
-     * @param filterType type of filter want to apply {@link PhotoEditorImpl}
+     * @param filterType type of filter want to apply [PhotoEditorImpl]
      */
-    void setFilterEffect(PhotoFilter filterType);
+    fun setFilterEffect(filterType: PhotoFilter?)
 
     /**
      * Save the edited image on given path
@@ -232,24 +229,24 @@ public interface PhotoEditor {
      * @param onSaveListener callback for saving image
      * @see OnSaveListener
      */
-    @RequiresPermission(allOf = {Manifest.permission.WRITE_EXTERNAL_STORAGE})
-    void saveAsFile(@NonNull String imagePath, @NonNull PhotoEditor.OnSaveListener onSaveListener);
-
+    @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
+    fun saveAsFile(imagePath: String, onSaveListener: OnSaveListener)
 
     /**
      * Save the edited image on given path
      *
      * @param imagePath      path on which image to be saved
-     * @param saveSettings   builder for multiple save options {@link SaveSettings}
+     * @param saveSettings   builder for multiple save options [SaveSettings]
      * @param onSaveListener callback for saving image
      * @see OnSaveListener
      */
     @SuppressLint("StaticFieldLeak")
-    @RequiresPermission(allOf = {Manifest.permission.WRITE_EXTERNAL_STORAGE})
-    void saveAsFile(@NonNull String imagePath,
-                    @NonNull SaveSettings saveSettings,
-                    @NonNull PhotoEditor.OnSaveListener onSaveListener);
-
+    @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
+    fun saveAsFile(
+        imagePath: String,
+        saveSettings: SaveSettings,
+        onSaveListener: OnSaveListener
+    )
 
     /**
      * Save the edited image as bitmap
@@ -258,105 +255,103 @@ public interface PhotoEditor {
      * @see OnSaveBitmap
      */
     @SuppressLint("StaticFieldLeak")
-    void saveAsBitmap(@NonNull OnSaveBitmap onSaveBitmap);
+    fun saveAsBitmap(onSaveBitmap: OnSaveBitmap)
 
     /**
      * Save the edited image as bitmap
      *
-     * @param saveSettings builder for multiple save options {@link SaveSettings}
+     * @param saveSettings builder for multiple save options [SaveSettings]
      * @param onSaveBitmap callback for saving image as bitmap
      * @see OnSaveBitmap
      */
     @SuppressLint("StaticFieldLeak")
-    void saveAsBitmap(@NonNull SaveSettings saveSettings,
-                      @NonNull OnSaveBitmap onSaveBitmap);
+    fun saveAsBitmap(
+        saveSettings: SaveSettings,
+        onSaveBitmap: OnSaveBitmap
+    )
 
     /**
-     * Callback on editing operation perform on {@link PhotoEditorView}
+     * Callback on editing operation perform on [PhotoEditorView]
      *
-     * @param onPhotoEditorListener {@link OnPhotoEditorListener}
+     * @param onPhotoEditorListener [OnPhotoEditorListener]
      */
-    void setOnPhotoEditorListener(@NonNull OnPhotoEditorListener onPhotoEditorListener);
+    fun setOnPhotoEditorListener(onPhotoEditorListener: OnPhotoEditorListener)
 
     /**
      * Check if any changes made need to save
      *
      * @return true if nothing is there to change
      */
-    boolean isCacheEmpty();
+    val isCacheEmpty: Boolean
 
     // NOTE(cheng): Added, departure from root.
-    void rotateImage(float rotation);
-    void removeInFocusView();
-    void bringToFrontInFocusView();
-    void mirrorInFocusView();
-    void unfocusView();
-    boolean getMainImageLockValue();
-    void lockMainImage();
-    void unlockMainImage();
-    PhotoEditorViewState getViewState();
+    fun rotateImage(rotation: Float)
+    fun removeInFocusView()
+    fun bringToFrontInFocusView()
+    fun mirrorInFocusView()
+    fun unfocusView()
+    val mainImageLockValue: Boolean
+    fun lockMainImage()
+    fun unlockMainImage()
+    val viewState: PhotoEditorViewState
 
     /**
-     * Builder pattern to define {@link PhotoEditor} Instance
+     * Builder pattern to define [PhotoEditor] Instance
      */
-    class Builder {
+    class Builder(var context: Context, var editorView: PhotoEditorView) {
+        var canvasView: RelativeLayout?
+        var imageView: ImageView?
+        var deleteView: View? = null
+        var overlayView: ImageView?
+        var backgroundView: ImageView?
+        var drawingView: DrawingView?
+        var textTypeface: Typeface? = null
+        var emojiTypeface: Typeface? = null
 
-        Context context;
-        PhotoEditorView editorView;
-        RelativeLayout canvasView;
-        ImageView imageView;
-        View deleteView;
-        ImageView overlayView;
-        ImageView backgroundView;
-        DrawingView drawingView;
-        Typeface textTypeface;
-        Typeface emojiTypeface;
         // By default, pinch-to-scale is enabled for text
-        boolean isTextPinchScalable = true;
-        boolean clipSourceImage = false;
+        var isTextPinchScalable = true
+        var clipSourceImage = false
 
         /**
          * Building a PhotoEditor which requires a Context and PhotoEditorView
          * which we have setup in our xml layout
          *
          * @param context         context
-         * @param photoEditorView {@link PhotoEditorView}
+         * @param photoEditorView [PhotoEditorView]
          */
-        public Builder(Context context, PhotoEditorView photoEditorView) {
-            this.context = context;
-            editorView = photoEditorView;
-            canvasView = photoEditorView.getCanvasLayout();
-            imageView = photoEditorView.getSource();
-            overlayView = photoEditorView.getImageOverlayView();
-            backgroundView = photoEditorView.getBackgroundView();
-            drawingView = photoEditorView.getDrawingView();
+        init {
+            canvasView = editorView.canvasLayout
+            imageView = editorView.source
+            overlayView = editorView.imageOverlayView
+            backgroundView = editorView.backgroundView
+            drawingView = editorView.drawingView
         }
 
-        Builder setDeleteView(View deleteView) {
-            this.deleteView = deleteView;
-            return this;
+        fun setDeleteView(deleteView: View?): Builder {
+            this.deleteView = deleteView
+            return this
         }
 
         /**
          * set default text font to be added on image
          *
          * @param textTypeface typeface for custom font
-         * @return {@link Builder} instant to build {@link PhotoEditor}
+         * @return [Builder] instant to build [PhotoEditor]
          */
-        public Builder setDefaultTextTypeface(Typeface textTypeface) {
-            this.textTypeface = textTypeface;
-            return this;
+        fun setDefaultTextTypeface(textTypeface: Typeface?): Builder {
+            this.textTypeface = textTypeface
+            return this
         }
 
         /**
          * set default font specific to add emojis
          *
          * @param emojiTypeface typeface for custom font
-         * @return {@link Builder} instant to build {@link PhotoEditor}
+         * @return [Builder] instant to build [PhotoEditor]
          */
-        public Builder setDefaultEmojiTypeface(Typeface emojiTypeface) {
-            this.emojiTypeface = emojiTypeface;
-            return this;
+        fun setDefaultEmojiTypeface(emojiTypeface: Typeface?): Builder {
+            this.emojiTypeface = emojiTypeface
+            return this
         }
 
         /**
@@ -364,18 +359,18 @@ public interface PhotoEditor {
          * Set to "true" by default.
          *
          * @param isTextPinchScalable flag to make pinch to zoom for text inserts.
-         * @return {@link Builder} instant to build {@link PhotoEditor}
+         * @return [Builder] instant to build [PhotoEditor]
          */
-        public Builder setPinchTextScalable(boolean isTextPinchScalable) {
-            this.isTextPinchScalable = isTextPinchScalable;
-            return this;
+        fun setPinchTextScalable(isTextPinchScalable: Boolean): Builder {
+            this.isTextPinchScalable = isTextPinchScalable
+            return this
         }
 
         /**
          * @return build PhotoEditor instance
          */
-        public PhotoEditor build() {
-            return new PhotoEditorImpl(this);
+        fun build(): PhotoEditor {
+            return PhotoEditorImpl(this)
         }
 
         /**
@@ -383,40 +378,34 @@ public interface PhotoEditor {
          *
          * @param clip a boolean to indicate if brush drawing is clipped or not.
          */
-        public Builder setClipSourceImage(boolean clip) {
-            this.clipSourceImage = clip;
-            return this;
+        fun setClipSourceImage(clip: Boolean): Builder {
+            clipSourceImage = clip
+            return this
         }
     }
-
 
     /**
      * A callback to save the edited image asynchronously
      */
     interface OnSaveListener {
-
         /**
          * Call when edited image is saved successfully on given path
          *
          * @param imagePath path on which image is saved
          */
-        void onSuccess(@NonNull String imagePath);
+        fun onSuccess(imagePath: String)
 
         /**
          * Call when failed to saved image on given path
          *
          * @param exception exception thrown while saving image
          */
-        void onFailure(@NonNull Exception exception);
+        fun onFailure(exception: Exception)
     }
-
-
     // region Shape
     /**
      * Update the current shape to be drawn,
      * through the use of a ShapeBuilder.
      */
-    void setShape(ShapeBuilder shapebuilder);
-    // endregion
-
+    fun setShape(shapebuilder: ShapeBuilder?) // endregion
 }

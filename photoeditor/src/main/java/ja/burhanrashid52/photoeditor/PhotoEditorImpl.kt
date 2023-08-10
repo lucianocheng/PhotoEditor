@@ -1,258 +1,214 @@
-package ja.burhanrashid52.photoeditor;
+package ja.burhanrashid52.photoeditor
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Typeface;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Map;
-
-import androidx.annotation.ColorInt;
-import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresPermission;
-
-import ja.burhanrashid52.photoeditor.shape.ShapeBuilder;
+import android.Manifest
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.Typeface
+import android.text.TextUtils
+import android.util.Log
+import android.view.View
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import android.widget.TextView
+import androidx.annotation.IntRange
+import androidx.annotation.RequiresPermission
+import ja.burhanrashid52.photoeditor.PhotoEditor.OnSaveListener
+import ja.burhanrashid52.photoeditor.ZoomLayout.lockedZoom
+import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 
 /**
- * <p>
- * This class in initialize by {@link PhotoEditor.Builder} using a builder pattern with multiple
- * editing attributes
- * </p>
  *
- * @author <a href="https://github.com/burhanrashid52">Burhanuddin Rashid</a>
+ *
+ * This class in initialize by [PhotoEditor.Builder] using a builder pattern with multiple
+ * editing attributes
+ *
+ *
+ * @author [Burhanuddin Rashid](https://github.com/burhanrashid52)
  * @version 0.1.1
  * @since 18/01/2017
  */
-public class PhotoEditorImpl implements PhotoEditor {
-
-    private static final String TAG = "PhotoEditor";
-    private final PhotoEditorView editorView;
-    private final PhotoEditorViewState viewState;
-    private final ImageView mainImageView;
-    private final View deleteView;
-    private final DrawingView drawingView;
-    private final BrushDrawingStateListener mBrushDrawingStateListener;
-    private final BoxHelper mBoxHelper;
-    private OnPhotoEditorListener mOnPhotoEditorListener;
-    private final boolean isTextPinchScalable;
-    private final Typeface mDefaultTextTypeface;
-    private final Typeface mDefaultEmojiTypeface;
-    private final GraphicManager mGraphicManager;
+class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") constructor(builder: PhotoEditor.Builder) :
+    PhotoEditor {
+    private val editorView: PhotoEditorView?
+    override val viewState: PhotoEditorViewState
+    private val mainImageView: ImageView?
+    private val deleteView: View?
+    private val drawingView: DrawingView?
+    private val mBrushDrawingStateListener: BrushDrawingStateListener
+    private val mBoxHelper: BoxHelper
+    private var mOnPhotoEditorListener: OnPhotoEditorListener? = null
+    private val isTextPinchScalable: Boolean
+    private val mDefaultTextTypeface: Typeface?
+    private val mDefaultEmojiTypeface: Typeface?
+    private val mGraphicManager: GraphicManager
 
     // NOTE(kleyow): This is custom added code diverging from https://github.com/burhanrashid52/PhotoEditor
-    private EditorTouchListener mEditorTouchListener;
-    private RelativeLayout canvasView;
-    private ImageView overlayView;
-    private ImageView backgroundView;
+    private val mEditorTouchListener: EditorTouchListener
+    private val canvasView: RelativeLayout?
+    private val overlayView: ImageView?
+    private val backgroundView: ImageView?
 
-    @SuppressLint("ClickableViewAccessibility")
-    protected PhotoEditorImpl(Builder builder) {
-        Context context = builder.context;
-        this.editorView = builder.editorView;
-        this.canvasView = builder.canvasView;
-        this.mainImageView = builder.imageView;
-        this.deleteView = builder.deleteView;
-        this.drawingView = builder.drawingView;
-        this.overlayView = builder.overlayView;
-        this.backgroundView = builder.backgroundView;
-        this.isTextPinchScalable = builder.isTextPinchScalable;
-        this.mDefaultTextTypeface = builder.textTypeface;
-        this.mDefaultEmojiTypeface = builder.emojiTypeface;
-
-        this.viewState = new PhotoEditorViewState();
-        this.mGraphicManager = new GraphicManager(builder.canvasView, this.viewState);
-        this.mBoxHelper = new BoxHelper(builder.canvasView, this.viewState);
-
-        mBrushDrawingStateListener = new BrushDrawingStateListener(builder.editorView, this.viewState);
-        this.drawingView.setBrushViewChangeListener(mBrushDrawingStateListener);
+    init {
+        val context = builder.context
+        editorView = builder.editorView
+        canvasView = builder.canvasView
+        mainImageView = builder.imageView
+        deleteView = builder.deleteView
+        drawingView = builder.drawingView
+        overlayView = builder.overlayView
+        backgroundView = builder.backgroundView
+        isTextPinchScalable = builder.isTextPinchScalable
+        mDefaultTextTypeface = builder.textTypeface
+        mDefaultEmojiTypeface = builder.emojiTypeface
+        viewState = PhotoEditorViewState()
+        mGraphicManager = GraphicManager(builder.canvasView!!, viewState)
+        mBoxHelper = BoxHelper(builder.canvasView!!, viewState)
+        mBrushDrawingStateListener = BrushDrawingStateListener(builder.editorView, viewState)
+        drawingView!!.setBrushViewChangeListener(mBrushDrawingStateListener)
 
         // Create scaling logic for background image.
-        this.mEditorTouchListener = new EditorTouchListener(
-                editorView,
-                canvasView,
-                this.viewState);
-
-        editorView.getParentLayout().setOnTouchListener(mEditorTouchListener);
-    }
-
-    @Override
-    public PhotoEditorViewState getViewState() {
-        return viewState;
+        mEditorTouchListener = EditorTouchListener(
+            editorView,
+            canvasView!!,
+            viewState
+        )
+        editorView.parentLayout.setOnTouchListener(mEditorTouchListener)
     }
 
     /**
-     * This will rotate the main image and all sub views on {@link PhotoEditorView}
+     * This will rotate the main image and all sub views on [PhotoEditorView]
      * NOTE(kleyow): This is custom added code diverging from https://github.com/burhanrashid52/PhotoEditor
      */
-    public void rotateImage(float rotation) {
+    override fun rotateImage(rotation: Float) {
         // Rotates the background image, main image, brush view and all currently placed stickers.
-        canvasView.setRotation(rotation);
-
-        if (mOnPhotoEditorListener != null)
-            mOnPhotoEditorListener.onRotateViewListener();
+        canvasView!!.rotation = rotation
+        if (mOnPhotoEditorListener != null) mOnPhotoEditorListener!!.onRotateViewListener()
     }
 
-
-    @Override
-    public View addImage(Bitmap desiredImage) {
-        drawingView.enableDrawing(false);
-
-        final MultiTouchListener multiTouchListener = getMultiTouchListener(true);
-        Sticker sticker = new Sticker(
-                canvasView,
-                editorView,
-                multiTouchListener,
-                viewState,
-                mOnPhotoEditorListener,
-                mGraphicManager
-        );
-        sticker.buildView(desiredImage);
-        multiTouchListener.setItemRootFrameView(sticker.getRootView());
-
-        sticker.getRootView().setOnTouchListener(multiTouchListener);
-
-        addToEditor(sticker);
-        final Map<View, MultiTouchListener> multiTouchListenerByView = viewState.getMultiTouchListenerByView();
-        multiTouchListenerByView.put(sticker.getRootView(), multiTouchListener);
-
-        if (mOnPhotoEditorListener != null)
-            mOnPhotoEditorListener.onInFocusViewChangeListener(sticker.getRootView());
-
-        return sticker.getRootView();
+    override fun addImage(desiredImage: Bitmap?): View? {
+        drawingView!!.enableDrawing(false)
+        val multiTouchListener = getMultiTouchListener(true)
+        val sticker = Sticker(
+            canvasView!!,
+            editorView!!,
+            multiTouchListener,
+            viewState,
+            mOnPhotoEditorListener!!,
+            mGraphicManager
+        )
+        sticker.buildView(desiredImage)
+        multiTouchListener.itemRootFrameView = sticker.rootView
+        sticker.rootView.setOnTouchListener(multiTouchListener)
+        addToEditor(sticker)
+        val multiTouchListenerByView = viewState.multiTouchListenerByView
+        multiTouchListenerByView.put(sticker.rootView, multiTouchListener)
+        if (mOnPhotoEditorListener != null) mOnPhotoEditorListener!!.onInFocusViewChangeListener(
+            sticker.rootView
+        )
+        return sticker.rootView
     }
 
-    @Override
-    public View addText(String text, final int colorCodeTextView) {
-        return addText(null, text, colorCodeTextView);
+    override fun addText(text: String?, colorCodeTextView: Int): View {
+        return addText(null, text, colorCodeTextView)
     }
 
-    @Override
-    public View addText(@Nullable Typeface textTypeface, String text, final int colorCodeTextView) {
-        final TextStyleBuilder styleBuilder = new TextStyleBuilder();
-
-        styleBuilder.withTextColor(colorCodeTextView);
+    override fun addText(textTypeface: Typeface?, text: String?, colorCodeTextView: Int): View {
+        val styleBuilder = TextStyleBuilder()
+        styleBuilder.withTextColor(colorCodeTextView)
         if (textTypeface != null) {
-            styleBuilder.withTextFont(textTypeface);
+            styleBuilder.withTextFont(textTypeface)
         }
-
-        return addText(text, styleBuilder);
+        return addText(text, styleBuilder)
     }
 
-    @Override
-    public View addText(String text, @Nullable TextStyleBuilder styleBuilder) {
-        drawingView.enableDrawing(false);
-        MultiTouchListener multiTouchListener = getMultiTouchListener(isTextPinchScalable);
-        Text textGraphic = new Text(
-                canvasView,
-                editorView,
-                multiTouchListener,
-                viewState,
-                mOnPhotoEditorListener,
-                mDefaultTextTypeface,
-                mGraphicManager
-        );
-        textGraphic.buildView(text, styleBuilder);
-        multiTouchListener.setItemRootFrameView(textGraphic.getRootView());
-
-        textGraphic.getRootView().setOnTouchListener(multiTouchListener);
-
-        addToEditor(textGraphic);
-
-        final Map<View, MultiTouchListener> multiTouchListenerByView = viewState.getMultiTouchListenerByView();
-        multiTouchListenerByView.put(textGraphic.getRootView(), multiTouchListener);
-
-        if (mOnPhotoEditorListener != null)
-            mOnPhotoEditorListener.onInFocusViewChangeListener(textGraphic.getRootView());
-
-        return textGraphic.getRootView();
+    override fun addText(text: String?, styleBuilder: TextStyleBuilder?): View {
+        drawingView!!.enableDrawing(false)
+        val multiTouchListener = getMultiTouchListener(isTextPinchScalable)
+        val textGraphic = Text(
+            canvasView!!,
+            editorView!!,
+            multiTouchListener,
+            viewState,
+            mOnPhotoEditorListener!!,
+            mDefaultTextTypeface,
+            mGraphicManager
+        )
+        textGraphic.buildView(text, styleBuilder)
+        multiTouchListener.itemRootFrameView = textGraphic.rootView
+        textGraphic.rootView.setOnTouchListener(multiTouchListener)
+        addToEditor(textGraphic)
+        val multiTouchListenerByView = viewState.multiTouchListenerByView
+        multiTouchListenerByView.put(textGraphic.rootView, multiTouchListener)
+        if (mOnPhotoEditorListener != null) mOnPhotoEditorListener!!.onInFocusViewChangeListener(
+            textGraphic.rootView
+        )
+        return textGraphic.rootView
     }
 
-    @Override
-    public void editText(@NonNull View view, String inputText, int colorCode) {
-        editText(view, null, inputText, colorCode);
+    override fun editText(view: View, inputText: String?, colorCode: Int) {
+        editText(view, null, inputText, colorCode)
     }
 
-    @Override
-    public void editText(@NonNull View view, @Nullable Typeface textTypeface, String inputText, int colorCode) {
-        final TextStyleBuilder styleBuilder = new TextStyleBuilder();
-        styleBuilder.withTextColor(colorCode);
+    override fun editText(view: View, textTypeface: Typeface?, inputText: String?, colorCode: Int) {
+        val styleBuilder = TextStyleBuilder()
+        styleBuilder.withTextColor(colorCode)
         if (textTypeface != null) {
-            styleBuilder.withTextFont(textTypeface);
+            styleBuilder.withTextFont(textTypeface)
         }
-
-        editText(view, inputText, styleBuilder);
+        editText(view, inputText, styleBuilder)
     }
 
-    @Override
-    public void editText(@NonNull View view, String inputText, @Nullable TextStyleBuilder styleBuilder) {
-        TextView inputTextView = view.findViewById(R.id.tvPhotoEditorText);
-        if (inputTextView != null && viewState.containsAddedView(view) && !TextUtils.isEmpty(inputText)) {
-            inputTextView.setText(inputText);
-            if (styleBuilder != null)
-                styleBuilder.applyStyle(inputTextView);
-            mGraphicManager.updateView(view);
+    override fun editText(view: View, inputText: String?, styleBuilder: TextStyleBuilder?) {
+        val inputTextView = view.findViewById<TextView>(R.id.tvPhotoEditorText)
+        if (inputTextView != null && viewState.containsAddedView(view) && !TextUtils.isEmpty(
+                inputText
+            )
+        ) {
+            inputTextView.text = inputText
+            styleBuilder?.applyStyle(inputTextView)
+            mGraphicManager.updateView(view)
         }
     }
 
-    @Override
-    public View addEmoji(String emojiName) {
-        return addEmoji(null, emojiName);
+    override fun addEmoji(emojiName: String?): View {
+        return addEmoji(null, emojiName)
     }
 
-
-    @Override
-    public View addEmoji(Typeface emojiTypeface, String emojiName) {
-        drawingView.enableDrawing(false);
+    override fun addEmoji(emojiTypeface: Typeface?, emojiName: String?): View {
+        drawingView!!.enableDrawing(false)
         // NOTE(kleyow): Emoji disappear when they are too big for some reason.
         //               I believe screen density plays into it, investigate a suitable font size
         //               again.
-
-        MultiTouchListener multiTouchListener = getMultiTouchListener(true);
-        Emoji emoji = new Emoji(
-                editorView,
-                canvasView,
-                multiTouchListener,
-                viewState,
-                mOnPhotoEditorListener,
-                mGraphicManager,
-                mDefaultEmojiTypeface
-        );
-        emoji.buildView(emojiTypeface, emojiName);
-        multiTouchListener.setItemRootFrameView(emoji.getRootView());
-
-        final TextView emojiTextView = emoji.getRootView().findViewById(R.id.tvPhotoEditorText);
-        emojiTextView.setTextSize(70f);
-        emojiTextView.setText(emojiName);
-
-        emoji.getRootView().setOnTouchListener(multiTouchListener);
-
-        addToEditor(emoji);
-
-        final Map<View, MultiTouchListener> multiTouchListenerByView = viewState.getMultiTouchListenerByView();
-        multiTouchListenerByView.put(emoji.getRootView(), multiTouchListener);
-
-        if (mOnPhotoEditorListener != null)
-            mOnPhotoEditorListener.onInFocusViewChangeListener(emoji.getRootView());
-
-        return emoji.getRootView();
+        val multiTouchListener = getMultiTouchListener(true)
+        val emoji = Emoji(
+            editorView!!,
+            canvasView!!,
+            multiTouchListener,
+            viewState,
+            mOnPhotoEditorListener!!,
+            mGraphicManager,
+            mDefaultEmojiTypeface
+        )
+        emoji.buildView(emojiTypeface, emojiName)
+        multiTouchListener.itemRootFrameView = emoji.rootView
+        val emojiTextView = emoji.rootView.findViewById<TextView>(R.id.tvPhotoEditorText)
+        emojiTextView.textSize = 70f
+        emojiTextView.text = emojiName
+        emoji.rootView.setOnTouchListener(multiTouchListener)
+        addToEditor(emoji)
+        val multiTouchListenerByView = viewState.multiTouchListenerByView
+        multiTouchListenerByView.put(emoji.rootView, multiTouchListener)
+        if (mOnPhotoEditorListener != null) mOnPhotoEditorListener!!.onInFocusViewChangeListener(
+            emoji.rootView
+        )
+        return emoji.rootView
     }
 
-    private void addToEditor(Graphic graphic) {
-        clearHelperBox();
-        mGraphicManager.addView(graphic);
+    private fun addToEditor(graphic: Graphic) {
+        clearHelperBox()
+        mGraphicManager.addView(graphic)
         // Change the in-focus view
-        viewState.setCurrentSelectedView(graphic.getRootView());
+        viewState.currentSelectedView = graphic.rootView
     }
 
     /**
@@ -261,284 +217,236 @@ public class PhotoEditorImpl implements PhotoEditor {
      * @param isPinchScalable true if make pinch-scalable, false otherwise.
      * @return scalable multitouch listener
      */
-    @NonNull
-    private MultiTouchListener getMultiTouchListener(final boolean isPinchScalable) {
-        return new MultiTouchListener(
-                deleteView,
-                editorView,
-                canvasView,
-                this.mainImageView,
-                isPinchScalable,
-                mOnPhotoEditorListener,
-                this.viewState);
+    private fun getMultiTouchListener(isPinchScalable: Boolean): MultiTouchListener {
+        return MultiTouchListener(
+            deleteView,
+            editorView!!,
+            canvasView!!,
+            mainImageView!!,
+            isPinchScalable,
+            mOnPhotoEditorListener,
+            viewState
+        )
     }
 
-    @Override
-    public void setBrushDrawingMode(boolean brushDrawingMode) {
+    override fun setBrushDrawingMode(brushDrawingMode: Boolean) {
+        drawingView?.enableDrawing(brushDrawingMode)
+    }
+
+    override val brushDrawableMode: Boolean
+        get() = drawingView != null && drawingView.isDrawingEnabled
+
+    override fun setOpacity(@IntRange(from = 0, to = 100) opacity: Int) {
+        var opacity = opacity
+        if (drawingView != null && drawingView.currentShapeBuilder != null) {
+            opacity = (opacity / 100.0 * 255.0).toInt()
+            drawingView.currentShapeBuilder!!.withShapeOpacity(opacity)
+        }
+    }
+
+    override var brushSize: Float
+        get() = if (drawingView != null && drawingView.currentShapeBuilder != null) {
+            drawingView.currentShapeBuilder!!.shapeSize
+        } else 0
+        set(size) {
+            if (drawingView != null && drawingView.currentShapeBuilder != null) {
+                drawingView.currentShapeBuilder!!.withShapeSize(size)
+            }
+        }
+    override var brushColor: Int
+        get() = if (drawingView != null && drawingView.currentShapeBuilder != null) {
+            drawingView.currentShapeBuilder!!.shapeColor
+        } else 0
+        set(color) {
+            if (drawingView != null && drawingView.currentShapeBuilder != null) {
+                drawingView.currentShapeBuilder!!.withShapeColor(color)
+            }
+        }
+
+    override fun setBrushEraserSize(brushEraserSize: Float) {
         if (drawingView != null) {
-            drawingView.enableDrawing(brushDrawingMode);
+            drawingView.eraserSize = brushEraserSize
         }
     }
 
-    @Override
-    public Boolean getBrushDrawableMode() {
-        return drawingView != null && drawingView.isDrawingEnabled();
+    override val eraserSize: Float
+        get() = drawingView?.eraserSize ?: 0
+
+    override fun brushEraser() {
+        drawingView?.brushEraser()
     }
 
-
-    @Override
-    public void setBrushSize(float size) {
-        if (drawingView != null && drawingView.getCurrentShapeBuilder() != null) {
-            drawingView.getCurrentShapeBuilder().withShapeSize(size);
-        }
+    override fun undo(): Boolean {
+        return mGraphicManager.undoView()
     }
 
-    @Override
-    public void setOpacity(@IntRange(from = 0, to = 100) int opacity) {
-        if (drawingView != null && drawingView.getCurrentShapeBuilder() != null) {
-            opacity = (int) ((opacity / 100.0) * 255.0);
-            drawingView.getCurrentShapeBuilder().withShapeOpacity(opacity);
-        }
+    override fun redo(): Boolean {
+        return mGraphicManager.redoView()
     }
 
-    @Override
-    public void setBrushColor(@ColorInt int color) {
-        if (drawingView != null && drawingView.getCurrentShapeBuilder() != null) {
-            drawingView.getCurrentShapeBuilder().withShapeColor(color);
-        }
-    }
-
-    @Override
-    public float getBrushSize() {
-        if (drawingView != null && drawingView.getCurrentShapeBuilder() != null) {
-            return drawingView.getCurrentShapeBuilder().getShapeSize();
-        }
-        return 0;
-    }
-
-    @Override
-    public int getBrushColor() {
-        if (drawingView != null && drawingView.getCurrentShapeBuilder() != null) {
-            return drawingView.getCurrentShapeBuilder().getShapeColor();
-        }
-        return 0;
-    }
-
-    @Override
-    public void setBrushEraserSize(float brushEraserSize) {
-        if (drawingView != null) {
-            drawingView.setEraserSize(brushEraserSize);
-        }
-    }
-
-    @Override
-    public float getEraserSize() {
-        return drawingView != null ? drawingView.getEraserSize() : 0;
-    }
-
-    @Override
-    public void brushEraser() {
-        if (drawingView != null)
-            drawingView.brushEraser();
-    }
-
-    @Override
-    public boolean undo() {
-        return mGraphicManager.undoView();
-    }
-
-    @Override
-    public boolean redo() {
-        return mGraphicManager.redoView();
-    }
-
-    public void removeInFocusView() {
-        final View inFocusView = viewState.getCurrentSelectedView();
-        if (inFocusView == null || viewState.getAddedViewsCount() == 0) {
-            return;
+    override fun removeInFocusView() {
+        val inFocusView = viewState.currentSelectedView
+        if (inFocusView == null || viewState.addedViewsCount == 0) {
+            return
         }
 
         // Remove the view from ViewState and the UI tree.
-        final Map<View, MultiTouchListener> multiTouchListenerByView =
-                viewState.getMultiTouchListenerByView();
-        multiTouchListenerByView.remove(inFocusView);
-        viewState.removeAddedView(inFocusView);
-        canvasView.removeView(inFocusView);
+        val multiTouchListenerByView = viewState.multiTouchListenerByView
+        multiTouchListenerByView.remove(inFocusView)
+        viewState.removeAddedView(inFocusView)
+        canvasView!!.removeView(inFocusView)
 
         // Fire the callback if the listener exists.
         if (mOnPhotoEditorListener != null) {
-            Object viewTag = inFocusView.getTag();
-            if (viewTag != null && viewTag instanceof ViewType) {
-                mOnPhotoEditorListener.onRemoveViewListener(
-                        (ViewType) viewTag,
-                        viewState.getAddedViewsCount()
-                );
+            val viewTag = inFocusView.tag
+            if (viewTag != null && viewTag is ViewType) {
+                mOnPhotoEditorListener!!.onRemoveViewListener(
+                    viewTag,
+                    viewState.addedViewsCount
+                )
             }
-            mOnPhotoEditorListener.onInFocusViewChangeListener(null);
+            mOnPhotoEditorListener!!.onInFocusViewChangeListener(null)
         }
     }
 
-    public void mirrorInFocusView() {
-        final View inFocusView = viewState.getCurrentSelectedView();
-        if (inFocusView == null) {
-            return;
-        }
+    override fun mirrorInFocusView() {
+        val inFocusView = viewState.currentSelectedView ?: return
 
         // Determine if image (sticker/emoji) or text, and rotate appropriately.
-        if (inFocusView.findViewById(R.id.imgPhotoEditorImage) instanceof ImageView) {
-            if (inFocusView.findViewById((R.id.imgPhotoEditorImage)).getRotationY() == 180) {
-                inFocusView.findViewById((R.id.imgPhotoEditorImage)).setRotationY(0f);
+        if (inFocusView.findViewById<View>(R.id.imgPhotoEditorImage) is ImageView) {
+            if (inFocusView.findViewById<View>(R.id.imgPhotoEditorImage).rotationY == 180f) {
+                inFocusView.findViewById<View>(R.id.imgPhotoEditorImage).rotationY = 0f
             } else {
-                inFocusView.findViewById((R.id.imgPhotoEditorImage)).setRotationY(180f);
+                inFocusView.findViewById<View>(R.id.imgPhotoEditorImage).rotationY = 180f
             }
-        } else if (inFocusView.findViewById(R.id.tvPhotoEditorText) instanceof TextView) {
-            if (inFocusView.findViewById((R.id.tvPhotoEditorText)).getRotationY() == 180) {
-                inFocusView.findViewById((R.id.tvPhotoEditorText)).setRotationY(0f);
+        } else if (inFocusView.findViewById<View>(R.id.tvPhotoEditorText) is TextView) {
+            if (inFocusView.findViewById<View>(R.id.tvPhotoEditorText).rotationY == 180f) {
+                inFocusView.findViewById<View>(R.id.tvPhotoEditorText).rotationY = 0f
             } else {
-                inFocusView.findViewById((R.id.tvPhotoEditorText)).setRotationY(180f);
+                inFocusView.findViewById<View>(R.id.tvPhotoEditorText).rotationY = 180f
             }
         }
 
         // Clear the intersection pixel map to force a recalculation of the transparent click-through.
-        final MultiTouchListener multiTouchListener = viewState.getMultiTouchListenerByView().get(inFocusView);
+        val multiTouchListener = viewState.multiTouchListenerByView[inFocusView]
         if (multiTouchListener != null) {
-            multiTouchListener.scaledImageIntersectionPixelMap = null;
+            multiTouchListener.scaledImageIntersectionPixelMap = null
         }
-
-        if (mOnPhotoEditorListener != null)
-            mOnPhotoEditorListener.onMirrorViewListener();
+        if (mOnPhotoEditorListener != null) mOnPhotoEditorListener!!.onMirrorViewListener()
     }
 
-    public void bringToFrontInFocusView() {
-        final View inFocusView = viewState.getCurrentSelectedView();
-        if (inFocusView == null) {
-            return;
-        }
-
-        inFocusView.bringToFront();
+    override fun bringToFrontInFocusView() {
+        val inFocusView = viewState.currentSelectedView ?: return
+        inFocusView.bringToFront()
     }
 
-
-    public void unfocusView() {
-        clearHelperBox();
+    override fun unfocusView() {
+        clearHelperBox()
     }
 
-    @Override
-    public void clearAllViews() {
-        mBoxHelper.clearAllViews(drawingView);
+    override fun clearAllViews() {
+        mBoxHelper.clearAllViews(drawingView)
     }
 
-    @Override
-    public void clearHelperBox() {
-        mBoxHelper.clearHelperBox();
-
-        if (mOnPhotoEditorListener != null)
-            mOnPhotoEditorListener.onInFocusViewChangeListener(null);
+    override fun clearHelperBox() {
+        mBoxHelper.clearHelperBox()
+        if (mOnPhotoEditorListener != null) mOnPhotoEditorListener!!.onInFocusViewChangeListener(
+            null
+        )
     }
 
-    @Override
-    public void setFilterEffect(CustomEffect customEffect) {
-        editorView.setFilterEffect(customEffect);
+    override fun setFilterEffect(customEffect: CustomEffect?) {
+        editorView!!.setFilterEffect(customEffect)
     }
 
-    @Override
-    public void setFilterEffect(PhotoFilter filterType) {
-        editorView.setFilterEffect(filterType);
+    override fun setFilterEffect(filterType: PhotoFilter?) {
+        editorView!!.setFilterEffect(filterType)
     }
 
-    @Override
-    @RequiresPermission(allOf = {Manifest.permission.WRITE_EXTERNAL_STORAGE})
-    public void saveAsFile(@NonNull final String imagePath, @NonNull final OnSaveListener onSaveListener) {
-        saveAsFile(imagePath, new SaveSettings.Builder().build(), onSaveListener);
+    @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
+    override fun saveAsFile(imagePath: String, onSaveListener: OnSaveListener) {
+        saveAsFile(imagePath, SaveSettings.Builder().build(), onSaveListener)
     }
 
-    @Override
     @SuppressLint("StaticFieldLeak")
-    public void saveAsFile(@NonNull final String imagePath,
-                           @NonNull final SaveSettings saveSettings,
-                           @NonNull final OnSaveListener onSaveListener) {
-        Log.d(TAG, "Image Path: " + imagePath);
-        editorView.saveFilter(new OnSaveBitmap() {
-            @Override
-            public void onBitmapReady(Bitmap saveBitmap) {
-                PhotoSaverTask photoSaverTask = new PhotoSaverTask(editorView, mBoxHelper);
-                photoSaverTask.setOnSaveListener(onSaveListener);
-                photoSaverTask.setSaveSettings(saveSettings);
-                photoSaverTask.execute(imagePath);
+    override fun saveAsFile(
+        imagePath: String,
+        saveSettings: SaveSettings,
+        onSaveListener: OnSaveListener
+    ) {
+        Log.d(TAG, "Image Path: $imagePath")
+        editorView!!.saveFilter(object : OnSaveBitmap {
+            override fun onBitmapReady(saveBitmap: Bitmap?) {
+                val photoSaverTask = PhotoSaverTask(editorView, mBoxHelper)
+                photoSaverTask.setOnSaveListener(onSaveListener)
+                photoSaverTask.setSaveSettings(saveSettings)
+                photoSaverTask.execute(imagePath)
             }
 
-            @Override
-            public void onFailure(Exception e) {
-                onSaveListener.onFailure(e);
+            override fun onFailure(e: Exception?) {
+                onSaveListener.onFailure(e!!)
             }
-        });
+        })
     }
 
-    @Override
-    public void saveAsBitmap(@NonNull final OnSaveBitmap onSaveBitmap) {
-        saveAsBitmap(new SaveSettings.Builder().build(), onSaveBitmap);
+    override fun saveAsBitmap(onSaveBitmap: OnSaveBitmap) {
+        saveAsBitmap(SaveSettings.Builder().build(), onSaveBitmap)
     }
 
-    @Override
     @SuppressLint("StaticFieldLeak")
-    public void saveAsBitmap(@NonNull final SaveSettings saveSettings,
-                             @NonNull final OnSaveBitmap onSaveBitmap) {
-        editorView.saveFilter(new OnSaveBitmap() {
-            @Override
-            public void onBitmapReady(Bitmap saveBitmap) {
-                PhotoSaverTask photoSaverTask = new PhotoSaverTask(editorView, mBoxHelper);
-                photoSaverTask.setOnSaveBitmap(onSaveBitmap);
-                photoSaverTask.setSaveSettings(saveSettings);
-                photoSaverTask.saveBitmap();
+    override fun saveAsBitmap(
+        saveSettings: SaveSettings,
+        onSaveBitmap: OnSaveBitmap
+    ) {
+        editorView!!.saveFilter(object : OnSaveBitmap {
+            override fun onBitmapReady(saveBitmap: Bitmap?) {
+                val photoSaverTask = PhotoSaverTask(editorView, mBoxHelper)
+                photoSaverTask.setOnSaveBitmap(onSaveBitmap)
+                photoSaverTask.setSaveSettings(saveSettings)
+                photoSaverTask.saveBitmap()
             }
 
-            @Override
-            public void onFailure(Exception e) {
-                onSaveBitmap.onFailure(e);
+            override fun onFailure(e: Exception?) {
+                onSaveBitmap.onFailure(e)
             }
-        });
+        })
     }
 
-    private static String convertEmoji(String emoji) {
-        String returnedEmoji;
-        try {
-            int convertEmojiToInt = Integer.parseInt(emoji.substring(2), 16);
-            returnedEmoji = new String(Character.toChars(convertEmojiToInt));
-        } catch (NumberFormatException e) {
-            returnedEmoji = "";
-        }
-        return returnedEmoji;
+    override fun setOnPhotoEditorListener(onPhotoEditorListener: OnPhotoEditorListener) {
+        mOnPhotoEditorListener = onPhotoEditorListener
+        mGraphicManager.onPhotoEditorListener = mOnPhotoEditorListener
+        mBrushDrawingStateListener.setOnPhotoEditorListener(mOnPhotoEditorListener)
+        mEditorTouchListener.setOnPhotoEditorListener(mOnPhotoEditorListener)
     }
 
-    @Override
-    public void setOnPhotoEditorListener(@NonNull OnPhotoEditorListener onPhotoEditorListener) {
-        this.mOnPhotoEditorListener = onPhotoEditorListener;
-        mGraphicManager.setOnPhotoEditorListener(mOnPhotoEditorListener);
-        mBrushDrawingStateListener.setOnPhotoEditorListener(mOnPhotoEditorListener);
-        mEditorTouchListener.setOnPhotoEditorListener(mOnPhotoEditorListener);
-    }
-
-    @Override
-    public boolean isCacheEmpty() {
-        return viewState.getAddedViewsCount() == 0 && viewState.getRedoViewsCount() == 0;
-    }
+    override val isCacheEmpty: Boolean
+        get() = viewState.addedViewsCount == 0 && viewState.redoViewsCount == 0
 
     // region Shape
-    @Override
-    public void setShape(ShapeBuilder shapeBuilder) {
-        drawingView.setCurrentShapeBuilder(shapeBuilder);
+    override fun setShape(shapeBuilder: ShapeBuilder?) {
+        drawingView!!.currentShapeBuilder = shapeBuilder
     }
+
     // endregion
-
-    public void lockMainImage() {
-        editorView.setLockedZoom(true);
+    override fun lockMainImage() {
+        editorView.lockedZoom = true
     }
 
-    public void unlockMainImage() {
-        editorView.setLockedZoom(false);
+    override fun unlockMainImage() {
+        editorView.lockedZoom = false
     }
 
-    public boolean getMainImageLockValue() {
-        return editorView.getLockedZoom();
+    companion object {
+        private const val TAG = "PhotoEditor"
+        private fun convertEmoji(emoji: String): String {
+            val returnedEmoji: String
+            returnedEmoji = try {
+                val convertEmojiToInt = emoji.substring(2).toInt(16)
+                String(Character.toChars(convertEmojiToInt))
+            } catch (e: NumberFormatException) {
+                ""
+            }
+            return returnedEmoji
+        }
     }
 }
