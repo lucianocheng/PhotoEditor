@@ -27,7 +27,7 @@ interface PhotoEditor {
      *
      * @param desiredImage bitmap image you want to add
      */
-    fun addImage(desiredImage: Bitmap?): View?
+    fun addImage(desiredImage: Bitmap?): View
 
     /**
      * This add the text on the [PhotoEditorView] with provided parameters

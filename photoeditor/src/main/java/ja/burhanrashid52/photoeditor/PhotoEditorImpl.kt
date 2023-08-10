@@ -84,7 +84,7 @@ class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") constructor(bu
         if (mOnPhotoEditorListener != null) mOnPhotoEditorListener!!.onRotateViewListener()
     }
 
-    override fun addImage(desiredImage: Bitmap?): View? {
+    override fun addImage(desiredImage: Bitmap?): View {
         drawingView!!.enableDrawing(false)
         val multiTouchListener = getMultiTouchListener(true)
         val sticker = Sticker(

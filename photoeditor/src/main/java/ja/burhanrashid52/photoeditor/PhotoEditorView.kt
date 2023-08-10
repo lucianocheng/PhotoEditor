@@ -24,7 +24,7 @@ import ja.burhanrashid52.photoeditor.FilterImageView.OnImageChangedListener
  * @since 1/18/2018
  */
 class PhotoEditorView : ZoomLayout {
-    private var mImgSource: FilterImageView? = null
+    private lateinit var mImgSource: FilterImageView
 
     /**
      * Overlay view which you want to edit
@@ -32,7 +32,7 @@ class PhotoEditorView : ZoomLayout {
      *
      * @return source ImageView
      */
-    var imageOverlayView: ImageView? = null
+    lateinit var imageOverlayView: ImageView
         private set
 
     /**
@@ -41,9 +41,9 @@ class PhotoEditorView : ZoomLayout {
      *
      * @return source ImageView
      */
-    var backgroundView: ImageView? = null
+    lateinit var backgroundView: ImageView
         private set
-    var drawingView: DrawingView? = null
+    lateinit var drawingView: DrawingView
         private set
     private var mImageFilterView: ImageFilterView? = null
     private var clipSourceImage = false
@@ -222,7 +222,7 @@ class PhotoEditorView : ZoomLayout {
      *
      * @return source ImageView
      */
-    val source: ImageView?
+    val source: ImageView
         get() = mImgSource
 
     fun resetSourceImageSettings() {
