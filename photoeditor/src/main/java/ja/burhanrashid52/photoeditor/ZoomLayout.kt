@@ -7,10 +7,9 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
-import android.view.View.OnTouchListener
-import ja.burhanrashid52.photoeditor.ZoomLayout
 
 /**
  * Layout that provides pinch-zooming of content. This view should have exactly one child
