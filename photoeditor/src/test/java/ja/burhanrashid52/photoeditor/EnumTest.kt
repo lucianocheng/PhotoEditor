@@ -12,10 +12,10 @@ class EnumTest {
         assertEquals(ViewType.values().size.toLong(), 4)
     }
 
-//    @Test
-//    fun testNumberOfShapeTypes() {
-//        assertEquals(ShapeType.values().size.toLong(), 4)
-//    }
+    @Test
+    fun testNumberOfShapeTypes() {
+        assertEquals(ShapeType.values().size.toLong(), 4)
+    }
 
     @Test
     fun testNumberOfPhotoFilterTypes() {

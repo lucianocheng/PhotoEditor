@@ -2,20 +2,25 @@ package ja.burhanrashid52.photoeditor
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.text.TextUtils
+import android.view.GestureDetector
 import android.view.View
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresPermission
+import ja.burhanrashid52.photoeditor.PhotoEditorImageViewListener.OnSingleTapUpCallback
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.util.Log
+import android.widget.RelativeLayout
+import ja.burhanrashid52.photoeditor.PhotoEditor.OnSaveListener
 
 /**
  *
@@ -53,7 +58,7 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
     private val overlayView: ImageView = builder.overlayView
     private val backgroundView: ImageView = builder.backgroundView
 
-    override fun addImage(desiredImage: Bitmap?): View {
+    override fun addImage(desiredImage: Bitmap?): View? {
         drawingView!!.enableDrawing(false)
         val multiTouchListener = getMultiTouchListener(true)
         val sticker = Sticker(
@@ -86,11 +91,11 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
         if (mOnPhotoEditorListener != null) mOnPhotoEditorListener!!.onRotateViewListener()
     }
 
-    override fun addText(text: String?, colorCodeTextView: Int): View {
+    override fun addText(text: String?, colorCodeTextView: Int): View? {
         return addText(null, text, colorCodeTextView)
     }
 
-    override fun addText(textTypeface: Typeface?, text: String?, colorCodeTextView: Int): View {
+    override fun addText(textTypeface: Typeface?, text: String?, colorCodeTextView: Int): View? {
         val styleBuilder = TextStyleBuilder()
         styleBuilder.withTextColor(colorCodeTextView)
         if (textTypeface != null) {
@@ -99,7 +104,7 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
         return addText(text, styleBuilder)
     }
 
-    override fun addText(text: String?, styleBuilder: TextStyleBuilder?): View {
+    override fun addText(text: String?, styleBuilder: TextStyleBuilder?): View? {
         drawingView?.enableDrawing(false)
         val multiTouchListener = getMultiTouchListener(isTextPinchScalable)
         val textGraphic = Text(
@@ -151,11 +156,11 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
         }
     }
 
-    override fun addEmoji(emojiName: String?): View {
+    override fun addEmoji(emojiName: String?): View? {
         return addEmoji(null, emojiName)
     }
 
-    override fun addEmoji(emojiTypeface: Typeface?, emojiName: String?): View {
+    override fun addEmoji(emojiTypeface: Typeface?, emojiName: String?): View? {
         drawingView?.enableDrawing(false)
         // NOTE(kleyow): Emoji disappear when they are too big for some reason.
         //               I believe screen density plays into it, investigate a suitable font size
@@ -446,16 +451,5 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
             viewState
         )
         photoEditorView.parentLayout?.setOnTouchListener(mEditorTouchListener)
-    }
-
-    private fun convertEmoji(emoji: String): String {
-        val returnedEmoji: String
-        returnedEmoji = try {
-            val convertEmojiToInt = emoji.substring(2).toInt(16)
-            String(Character.toChars(convertEmojiToInt))
-        } catch (e: NumberFormatException) {
-            ""
-        }
-        return returnedEmoji
     }
 }

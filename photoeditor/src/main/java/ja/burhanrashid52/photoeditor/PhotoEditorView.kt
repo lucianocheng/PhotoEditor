@@ -76,6 +76,7 @@ class PhotoEditorView @JvmOverloads constructor(
             }
         })
 
+
         //Setup drawing view
         drawingView = DrawingView(context)
         val brushParam = setupDrawingView()
@@ -203,12 +204,12 @@ class PhotoEditorView @JvmOverloads constructor(
     val source: ImageView
         get() = mImgSource
 
-    fun resetSourceImageSettings() {
-        // NOTE(kleyow): Need to reset image after changing the main image because Zooming changes
-        //               the settings.
-        mImgSource!!.adjustViewBounds = true
-        mImgSource!!.scaleType = ImageView.ScaleType.FIT_CENTER
-    }
+//    fun resetSourceImageSettings() {
+//        // NOTE(kleyow): Need to reset image after changing the main image because Zooming changes
+//        //               the settings.
+//        mImgSource!!.adjustViewBounds = true
+//        mImgSource!!.scaleType = ImageView.ScaleType.FIT_CENTER
+//    }
 
     suspend fun saveFilter(): Bitmap {
         return if (mImageFilterView.visibility == VISIBLE) {

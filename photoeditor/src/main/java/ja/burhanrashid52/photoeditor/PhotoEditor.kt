@@ -7,13 +7,11 @@ import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.view.View
 import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresPermission
 import androidx.annotation.UiThread
-import ja.burhanrashid52.photoeditor.PhotoEditorView
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
+import android.widget.RelativeLayout
 
 /**
  * Created by Burhanuddin Rashid on 14/05/21.
@@ -27,7 +25,7 @@ interface PhotoEditor {
      *
      * @param desiredImage bitmap image you want to add
      */
-    fun addImage(desiredImage: Bitmap?): View
+    fun addImage(desiredImage: Bitmap?): View?
 
     /**
      * This add the text on the [PhotoEditorView] with provided parameters
@@ -37,7 +35,7 @@ interface PhotoEditor {
      * @param colorCodeTextView text color to be displayed
      */
     @SuppressLint("ClickableViewAccessibility")
-    fun addText(text: String?, colorCodeTextView: Int): View
+    fun addText(text: String?, colorCodeTextView: Int): View?
 
     /**
      * This add the text on the [PhotoEditorView] with provided parameters
@@ -48,7 +46,7 @@ interface PhotoEditor {
      * @param colorCodeTextView text color to be displayed
      */
     @SuppressLint("ClickableViewAccessibility")
-    fun addText(textTypeface: Typeface?, text: String?, colorCodeTextView: Int): View
+    fun addText(textTypeface: Typeface?, text: String?, colorCodeTextView: Int): View?
 
     /**
      * This add the text on the [PhotoEditorView] with provided parameters
@@ -58,7 +56,7 @@ interface PhotoEditor {
      * @param styleBuilder text style builder with your style
      */
     @SuppressLint("ClickableViewAccessibility")
-    fun addText(text: String?, styleBuilder: TextStyleBuilder?): View
+    fun addText(text: String?, styleBuilder: TextStyleBuilder?): View?
 
     /**
      * This will update text and color on provided view
@@ -94,7 +92,7 @@ interface PhotoEditor {
      *
      * @param emojiName unicode in form of string to display emoji
      */
-    fun addEmoji(emojiName: String?): View
+    fun addEmoji(emojiName: String?): View?
 
     /**
      * Adds emoji to the [PhotoEditorView] which you drag,rotate and scale using pinch
@@ -103,7 +101,7 @@ interface PhotoEditor {
      * @param emojiTypeface typeface for custom font to show emoji unicode in specific font
      * @param emojiName     unicode in form of string to display emoji
      */
-    fun addEmoji(emojiTypeface: Typeface?, emojiName: String?): View
+    fun addEmoji(emojiTypeface: Typeface?, emojiName: String?): View?
 
     /**
      * Enable/Disable drawing mode to draw on [PhotoEditorView]
@@ -304,7 +302,6 @@ interface PhotoEditor {
 
         @JvmField
         var clipSourceImage = false
-
         fun setDeleteView(deleteView: View?): Builder {
             this.deleteView = deleteView
             return this
