@@ -103,6 +103,8 @@ internal object BitmapUtil {
         } catch (e: GLException) {
             return null
         }
+
         return Bitmap.createBitmap(bitmapSource, w, h, Bitmap.Config.ARGB_8888)
     }
+
 }

@@ -10,21 +10,23 @@ import androidx.annotation.ColorInt
  *
  */
 class ShapeBuilder {
-    var shapeType: ShapeType? = null
+
+    var shapeType: ShapeType = ShapeType.Brush
         private set
-    var shapeSize = 0f
+
+    var shapeSize: Float = DEFAULT_SHAPE_SIZE
         private set
 
     @androidx.annotation.IntRange(from = 0, to = 255)
-    var shapeOpacity = 0
+    var shapeOpacity: Int? = DEFAULT_SHAPE_OPACITY
         private set
 
     @get:ColorInt
     @ColorInt
-    var shapeColor = 0
+    var shapeColor: Int = DEFAULT_SHAPE_COLOR
         private set
 
-    fun withShapeType(shapeType: ShapeType?): ShapeBuilder {
+    fun withShapeType(shapeType: ShapeType): ShapeBuilder {
         this.shapeType = shapeType
         return this
     }
@@ -38,7 +40,7 @@ class ShapeBuilder {
         @androidx.annotation.IntRange(
             from = 0,
             to = 255
-        ) opacity: Int
+        ) opacity: Int?
     ): ShapeBuilder {
         shapeOpacity = opacity
         return this
@@ -57,7 +59,7 @@ class ShapeBuilder {
 
     init {
         // default values
-        withShapeType(ShapeType.BRUSH)
+        withShapeType(ShapeType.Brush)
         withShapeSize(DEFAULT_SHAPE_SIZE)
         withShapeOpacity(DEFAULT_SHAPE_OPACITY)
         withShapeColor(DEFAULT_SHAPE_COLOR)

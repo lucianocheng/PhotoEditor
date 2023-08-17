@@ -115,7 +115,7 @@ interface PhotoEditor {
     /**
      * @return true is brush mode is enabled
      */
-    val brushDrawableMode: Boolean
+    val brushDrawableMode: Boolean?
 
     /**
      * set opacity/transparency of brush while painting on [DrawingView]
@@ -213,24 +213,14 @@ interface PhotoEditor {
      *
      * @param customEffect [CustomEffect.Builder.setParameter]
      */
-    fun setFilterEffect(customEffect: CustomEffect?)
+    fun setFilterEffect(customEffect: CustomEffect)
 
     /**
      * Set pre-define filter available
      *
      * @param filterType type of filter want to apply [PhotoEditorImpl]
      */
-    fun setFilterEffect(filterType: PhotoFilter?)
-
-    /**
-     * Save the edited image on given path
-     *
-     * @param imagePath      path on which image to be saved
-     * @param onSaveListener callback for saving image
-     * @see OnSaveListener
-     */
-    @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
-    fun saveAsFile(imagePath: String, onSaveListener: OnSaveListener)
+    fun setFilterEffect(filterType: PhotoFilter)
 
     /**
      * Save the edited image on given path
@@ -242,33 +232,25 @@ interface PhotoEditor {
      */
     @SuppressLint("StaticFieldLeak")
     @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE])
-    fun saveAsFile(
+    suspend fun saveAsFile(
         imagePath: String,
-        saveSettings: SaveSettings,
-        onSaveListener: OnSaveListener
-    )
-
-    /**
-     * Save the edited image as bitmap
-     *
-     * @param onSaveBitmap callback for saving image as bitmap
-     * @see OnSaveBitmap
-     */
-    @SuppressLint("StaticFieldLeak")
-    fun saveAsBitmap(onSaveBitmap: OnSaveBitmap)
+        saveSettings: SaveSettings = SaveSettings.Builder().build()
+    ): SaveFileResult
 
     /**
      * Save the edited image as bitmap
      *
      * @param saveSettings builder for multiple save options [SaveSettings]
-     * @param onSaveBitmap callback for saving image as bitmap
-     * @see OnSaveBitmap
      */
-    @SuppressLint("StaticFieldLeak")
-    fun saveAsBitmap(
-        saveSettings: SaveSettings,
-        onSaveBitmap: OnSaveBitmap
-    )
+    suspend fun saveAsBitmap(saveSettings: SaveSettings = SaveSettings.Builder().build()): Bitmap?
+
+    fun saveAsFile(imagePath: String, saveSettings: SaveSettings, onSaveListener: OnSaveListener)
+
+    fun saveAsFile(imagePath: String, onSaveListener: OnSaveListener)
+
+    fun saveAsBitmap(saveSettings: SaveSettings, onSaveBitmap: OnSaveBitmap)
+
+    fun saveAsBitmap(onSaveBitmap: OnSaveBitmap)
 
     /**
      * Callback on editing operation perform on [PhotoEditorView]
@@ -290,7 +272,7 @@ interface PhotoEditor {
     fun bringToFrontInFocusView()
     fun mirrorInFocusView()
     fun unfocusView()
-    val mainImageLockValue: Boolean
+    fun getMainImageLockValue(): Boolean
     fun lockMainImage()
     fun unlockMainImage()
     val viewState: PhotoEditorViewState
@@ -298,34 +280,30 @@ interface PhotoEditor {
     /**
      * Builder pattern to define [PhotoEditor] Instance
      */
-    class Builder(var context: Context, var editorView: PhotoEditorView) {
-        var canvasView: RelativeLayout?
-        var imageView: ImageView?
+    class Builder(var context: Context, var photoEditorView: PhotoEditorView) {
+        @JvmField
+        var canvasView: RelativeLayout
+        @JvmField
+        var imageView: ImageView? = null
+        @JvmField
         var deleteView: View? = null
-        var overlayView: ImageView?
-        var backgroundView: ImageView?
-        var drawingView: DrawingView?
+        @JvmField
+        var overlayView: ImageView
+        @JvmField
+        var backgroundView: ImageView
+        @JvmField
+        var drawingView: DrawingView? = null
+        @JvmField
         var textTypeface: Typeface? = null
+        @JvmField
         var emojiTypeface: Typeface? = null
 
         // By default, pinch-to-scale is enabled for text
+        @JvmField
         var isTextPinchScalable = true
-        var clipSourceImage = false
 
-        /**
-         * Building a PhotoEditor which requires a Context and PhotoEditorView
-         * which we have setup in our xml layout
-         *
-         * @param context         context
-         * @param photoEditorView [PhotoEditorView]
-         */
-        init {
-            canvasView = editorView.canvasLayout
-            imageView = editorView.source
-            overlayView = editorView.imageOverlayView
-            backgroundView = editorView.backgroundView
-            drawingView = editorView.drawingView
-        }
+        @JvmField
+        var clipSourceImage = false
 
         fun setDeleteView(deleteView: View?): Builder {
             this.deleteView = deleteView
@@ -382,6 +360,21 @@ interface PhotoEditor {
             clipSourceImage = clip
             return this
         }
+
+        /**
+         * Building a PhotoEditor which requires a Context and PhotoEditorView
+         * which we have setup in our xml layout
+         *
+         * @param context         context
+         * @param photoEditorView [PhotoEditorView]
+         */
+        init {
+            canvasView = photoEditorView.canvasLayout!!
+            imageView = photoEditorView.source
+            overlayView = photoEditorView.imageOverlayView!!
+            backgroundView = photoEditorView.backgroundView!!
+            drawingView = photoEditorView.drawingView
+        }
     }
 
     /**
@@ -402,10 +395,11 @@ interface PhotoEditor {
          */
         fun onFailure(exception: Exception)
     }
+
     // region Shape
     /**
      * Update the current shape to be drawn,
      * through the use of a ShapeBuilder.
      */
-    fun setShape(shapebuilder: ShapeBuilder?) // endregion
+    fun setShape(shapeBuilder: ShapeBuilder) // endregion
 }

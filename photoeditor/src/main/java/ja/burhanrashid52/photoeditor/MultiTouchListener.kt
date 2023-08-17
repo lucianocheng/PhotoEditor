@@ -1,16 +1,16 @@
 package ja.burhanrashid52.photoeditor
 
-import android.graphics.Matrix
 import android.graphics.Rect
+import android.graphics.Matrix
 import android.util.Log
 import android.widget.RelativeLayout
-import android.view.View.OnTouchListener
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.View
-import android.widget.FrameLayout
+import android.view.View.OnTouchListener
 import android.widget.ImageView
+import android.widget.FrameLayout
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -28,7 +28,7 @@ class MultiTouchListener(
     deleteView: View?,
     photoEditorView: PhotoEditorView,
     canvasView: RelativeLayout,
-    photoEditImageView: ImageView,
+    photoEditImageView: ImageView?,
     private val mIsPinchScalable: Boolean,
     onPhotoEditorListener: OnPhotoEditorListener?,
     viewState: PhotoEditorViewState

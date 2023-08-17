@@ -85,3 +85,17 @@ new TextStyleBuilder()
 
 ### 2.0.0
 - New : Migrated the app and library to Kotlin
+
+### 3.0.0
+- New : Arrow shape
+- Change : (Breaking Change) `minSdkVersion` changed to `21`
+- Change : (Breaking Change) Shape names are no longer UPPERCASE
+- New : Suspending functions for saving images: `saveAsFile(String[, SaveSettings])` and `saveAsBitmap([SaveSettings])`
+- Fixed : #374 `IndexOutOfBoundsException` when saving bitmap
+
+### 3.0.1
+- New : #518 Fix Builder methods' return type in Java
+- Fixed : #522 Leak Graphics memory when changing filter
+
+### 3.x.x
+- Change : (Breaking Change) Change some nullable values to non-null values
