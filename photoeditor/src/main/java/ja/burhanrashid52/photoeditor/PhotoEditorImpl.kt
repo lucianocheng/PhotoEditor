@@ -385,25 +385,6 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
         saveAsBitmap(SaveSettings.Builder().build(), onSaveBitmap)
     }
 
-//    @SuppressLint("StaticFieldLeak")
-//    override fun saveAsBitmap(
-//        saveSettings: SaveSettings,
-//        onSaveBitmap: OnSaveBitmap
-//    ) {
-//        photoEditorView.saveFilter(object : OnSaveBitmap {
-//            override fun onBitmapReady(saveBitmap: Bitmap?) {
-//                val photoSaverTask = PhotoSaverTask(photoEditorView, mBoxHelper)
-//                photoSaverTask.setOnSaveBitmap(onSaveBitmap)
-//                photoSaverTask.setSaveSettings(saveSettings)
-//                photoSaverTask.saveBitmap()
-//            }
-//
-//            override fun onFailure(e: Exception?) {
-//                onSaveBitmap.onFailure(e)
-//            }
-//        })
-//    }
-
     override fun setOnPhotoEditorListener(onPhotoEditorListener: OnPhotoEditorListener) {
         mOnPhotoEditorListener = onPhotoEditorListener
         mGraphicManager.onPhotoEditorListener = mOnPhotoEditorListener
