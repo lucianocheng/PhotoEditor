@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresPermission
 import androidx.annotation.UiThread
+import androidx.lifecycle.LiveData
 import ja.burhanrashid52.photoeditor.PhotoEditorView
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 
@@ -275,6 +276,9 @@ interface PhotoEditor {
     fun getMainImageLockValue(): Boolean
     fun lockMainImage()
     fun unlockMainImage()
+    fun changeZoom(zoom: Float)
+    fun resetZoom()
+    val zoomLiveData: LiveData<Float>
     val viewState: PhotoEditorViewState
 
     /**
