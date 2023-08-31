@@ -7,10 +7,11 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
-import android.view.View.OnTouchListener
-import ja.burhanrashid52.photoeditor.ZoomLayout
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 
 /**
  * Layout that provides pinch-zooming of content. This view should have exactly one child
@@ -37,6 +38,9 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
     private var prevDx = 0f
     private var prevDy = 0f
     var lockedZoom = false
+
+    private val _zoomLiveData = MutableLiveData(scale)
+    val zoomLiveData: LiveData<Float> = _zoomLiveData
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -142,6 +146,7 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
             dx += (dx - focusX) * (adjustedScaleFactor - 1)
             dy += (dy - focusY) * (adjustedScaleFactor - 1)
             Log.d(TAG, "onScale, dx/dy = $dx/$dy")
+            _zoomLiveData.value = scale
         } else {
             lastScaleFactor = 0f
         }
@@ -150,6 +155,20 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
 
     override fun onScaleEnd(scaleDetector: ScaleGestureDetector) {
         Log.i(TAG, "onScaleEnd")
+    }
+
+    fun changeZoom(zoom: Float) {
+        if (zoom in MIN_ZOOM..MAX_ZOOM) {
+            scale = zoom
+            dx = 0f
+            dy = 0f
+            applyScaleAndTranslation()
+            _zoomLiveData.value = scale
+        }
+    }
+
+    fun resetZoom() {
+        changeZoom(1f)
     }
 
     private fun applyScaleAndTranslation() {

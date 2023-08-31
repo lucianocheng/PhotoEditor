@@ -11,6 +11,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresPermission
+import androidx.lifecycle.LiveData
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -407,6 +408,17 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
     override fun unlockMainImage() {
         photoEditorView.lockedZoom = false
     }
+
+    override fun changeZoom(zoom: Float) {
+        photoEditorView.changeZoom(zoom)
+    }
+
+    override fun resetZoom() {
+        photoEditorView.resetZoom()
+    }
+
+    override val zoomLiveData: LiveData<Float>
+        get() = photoEditorView.zoomLiveData
 
     override fun getMainImageLockValue(): Boolean {
         return photoEditorView.lockedZoom
