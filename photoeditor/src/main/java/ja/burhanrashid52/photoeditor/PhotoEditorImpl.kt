@@ -267,6 +267,7 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
         val multiTouchListenerByView = viewState.multiTouchListenerByView
         multiTouchListenerByView.remove(inFocusView)
         viewState.removeAddedView(inFocusView)
+        viewState.clearCurrentSelectedView()
         canvasView.removeView(inFocusView)
 
         // Fire the callback if the listener exists.
