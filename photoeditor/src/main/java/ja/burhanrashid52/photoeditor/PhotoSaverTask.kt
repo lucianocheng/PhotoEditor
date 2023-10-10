@@ -2,12 +2,12 @@ package ja.burhanrashid52.photoeditor
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.net.Uri
 import android.view.View
 import ja.burhanrashid52.photoeditor.BitmapUtil.removeTransparency
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 
 /**
@@ -45,7 +45,9 @@ internal class PhotoSaverTask(
         val result = withContext(Dispatchers.IO) {
             val file = File(imagePath)
             try {
-                FileOutputStream(file, false).use { outputStream ->
+                photoEditorView.context.contentResolver.openOutputStream(
+                    Uri.fromFile(file)
+                )?.use { outputStream ->
                     capturedBitmap.compress(
                         saveSettings.compressFormat,
                         saveSettings.compressQuality,
