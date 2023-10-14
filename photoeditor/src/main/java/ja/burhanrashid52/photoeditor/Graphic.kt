@@ -62,6 +62,13 @@ internal abstract class Graphic(
         val boxHelper = BoxHelper(canvasView, viewState)
         return object : OnGestureControl {
             override fun onClick() {
+                if (viewState.currentSelectedView == rootView)
+                    return
+
+                if (viewState.currentSelectedView != null && viewState.currentSelectedView != rootView) {
+                    onPhotoEditorListener?.onInFocusViewChangeListener(null)
+                }
+
                 boxHelper.clearHelperBox()
                 toggleSelection()
                 // Change the in-focus view
@@ -77,14 +84,16 @@ internal abstract class Graphic(
 
             override fun onDown() {}
             override fun onFling() {
-                boxHelper.clearHelperBox()
-                toggleSelection()
+                if (viewState.currentSelectedView == null) {
+                    boxHelper.clearHelperBox()
+                    toggleSelection()
 
-                // Change the in-focus view
-                viewState.currentSelectedView = rootView
-                onPhotoEditorListener?.onInFocusViewChangeListener(
-                    rootView
-                )
+                    // Change the in-focus view
+                    viewState.currentSelectedView = rootView
+                    onPhotoEditorListener?.onInFocusViewChangeListener(
+                        rootView
+                    )
+                }
             }
         }
     }
