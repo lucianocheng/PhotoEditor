@@ -91,4 +91,14 @@ interface OnPhotoEditorListener {
      * @param view view that is in focus.
      */
     fun onInFocusViewChangeListener(view: View?)
+
+    fun onGraphicActionDown(view: View)
+
+    fun onGraphicMove(
+        view: View,
+        info: MultiTouchListener.TransformInfo,
+        editorScaleX: Float,
+        initialStickerScale: Float,
+        initialStickerRotation: Float
+    )
 }

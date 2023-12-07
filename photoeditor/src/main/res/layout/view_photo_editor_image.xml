@@ -28,27 +28,27 @@
 
     <ImageView
         android:id="@+id/imgHandleTopLeft"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="@dimen/handle_size"
+        android:layout_height="@dimen/handle_size"
         android:layout_gravity="top|start"
         android:src="@drawable/ic_zoom_reverse" />
     <ImageView
         android:id="@+id/imgHandleTopRight"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="@dimen/handle_size"
+        android:layout_height="@dimen/handle_size"
         android:layout_gravity="top|end"
         android:src="@drawable/ic_zoom_forward" />
     <ImageView
         android:id="@+id/imgHandleBottomRight"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="@dimen/handle_size"
+        android:layout_height="@dimen/handle_size"
         android:layout_gravity="bottom|end"
         android:src="@drawable/ic_zoom_reverse"
         />
     <ImageView
         android:id="@+id/imgHandleBottomLeft"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="@dimen/handle_size"
+        android:layout_height="@dimen/handle_size"
         android:layout_gravity="bottom|start"
         android:src="@drawable/ic_zoom_forward" />
 </FrameLayout>

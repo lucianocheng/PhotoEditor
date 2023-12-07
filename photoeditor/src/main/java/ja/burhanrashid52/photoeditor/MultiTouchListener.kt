@@ -1,9 +1,8 @@
 package ja.burhanrashid52.photoeditor
 
-import android.graphics.Rect
 import android.graphics.Matrix
+import android.graphics.Rect
 import android.util.Log
-import android.widget.RelativeLayout
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
@@ -11,9 +10,8 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.widget.ImageView
 import android.widget.FrameLayout
+import android.widget.RelativeLayout
 import java.util.*
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * Touch listener for stickers, emoji, text, etc.
@@ -89,6 +87,9 @@ class MultiTouchListener(
 
         // NOTE(cheng): This view is the root view.  E.g., the imageRootView
         if (view === viewState.currentSelectedView) {
+            if (event.action and event.actionMasked == MotionEvent.ACTION_DOWN) {
+                mOnPhotoEditorListener?.onGraphicActionDown(view)
+            }
             mScaleGestureDetector.onTouchEvent(view, event)
         }
         mGestureListener.onTouchEvent(event)
@@ -260,10 +261,10 @@ class MultiTouchListener(
             // TODO(cheng): Determines why these are disabled.
             // info.minimumScale = minimumScale
             //info.maximumScale = maximumScale
-            move(
+            mOnPhotoEditorListener?.onGraphicMove(
                 view,
                 info,
-                photoEditorView.scaleX,
+                photoEditorView.parentLayout.scaleX,
                 view.scaleX,
                 view.rotation
             )
@@ -353,6 +354,44 @@ class MultiTouchListener(
                     degrees + 360.0f
                 }
                 else -> degrees
+            }
+        }
+
+        fun fixHandlesSizes(view: View, editorScaleX: Float) {
+            val imgHandleTopLeft = view.findViewById<View>(R.id.imgHandleTopLeft)
+            val imgHandleTopRight = view.findViewById<View>(R.id.imgHandleTopRight)
+            val imgHandleBottomLeft = view.findViewById<View>(R.id.imgHandleBottomLeft)
+            val imgHandleBottomRight = view.findViewById<View>(R.id.imgHandleBottomRight)
+
+            if (imgHandleTopLeft != null && imgHandleTopRight != null
+                && imgHandleBottomLeft != null && imgHandleBottomRight != null) {
+
+                val standardHandleSize = view.resources.getDimension(R.dimen.handle_size)
+                val adjustedHandleSize = standardHandleSize / editorScaleX
+                val handleSize = imgHandleTopLeft.width
+
+                if (handleSize != adjustedHandleSize.toInt()) {
+                    imgHandleTopLeft.let {
+                        it.layoutParams.width = adjustedHandleSize.toInt()
+                        it.layoutParams.height = adjustedHandleSize.toInt()
+                        it.requestLayout()
+                    }
+                    imgHandleTopRight.let {
+                        it.layoutParams.width = adjustedHandleSize.toInt()
+                        it.layoutParams.height = adjustedHandleSize.toInt()
+                        it.requestLayout()
+                    }
+                    imgHandleBottomLeft.let {
+                        it.layoutParams.width = adjustedHandleSize.toInt()
+                        it.layoutParams.height = adjustedHandleSize.toInt()
+                        it.requestLayout()
+                    }
+                    imgHandleBottomRight.let {
+                        it.layoutParams.width = adjustedHandleSize.toInt()
+                        it.layoutParams.height = adjustedHandleSize.toInt()
+                        it.requestLayout()
+                    }
+                }
             }
         }
 
