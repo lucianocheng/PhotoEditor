@@ -73,6 +73,30 @@ class PhotoEditorView @JvmOverloads constructor(
                 mImageFilterView.setFilterEffect(PhotoFilter.NONE)
                 mImageFilterView.setSourceBitmap(sourceBitmap)
                 Log.d(TAG, "onBitmapLoaded() called with: sourceBitmap = [$sourceBitmap]")
+
+                if (sourceBitmap != null && parentLayout.width > 0 && parentLayout.height > 0) {
+                    val imageWidth = sourceBitmap.width
+                    val imageHeight = sourceBitmap.height
+                    val parentWidth = parentLayout.width
+                    val parentHeight = parentLayout.height
+
+                    val parentAspectRatio = parentWidth / parentHeight.toFloat()
+                    val imageAspectRatio = imageWidth / imageHeight.toFloat()
+
+                    val canvasImageWidth: Int
+                    val canvasImageHeight: Int
+
+                    if (parentAspectRatio < imageAspectRatio) {
+                        canvasImageWidth = parentWidth
+                        canvasImageHeight = parentWidth * imageHeight / imageWidth
+                    } else {
+                        canvasImageWidth = parentHeight * imageWidth / imageHeight
+                        canvasImageHeight = parentHeight
+                    }
+
+                    canvasLayout.layoutParams.width = canvasImageWidth
+                    canvasLayout.layoutParams.height = canvasImageHeight
+                }
             }
         })
 
@@ -108,10 +132,14 @@ class PhotoEditorView @JvmOverloads constructor(
 
         //Add brush view
         canvasLayout!!.addView(drawingView, brushParam)
-        parentLayout!!.addView(canvasLayout)
+        val canvasParam = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        canvasParam.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE)
+        parentLayout.addView(canvasLayout, canvasParam)
 
         // Add overlay view
-        addView(imageOverlayView, imgOverlayParam)
+        canvasLayout.addView(imageOverlayView, imgOverlayParam)
     }
 
     @SuppressLint("Recycle")
@@ -188,7 +216,7 @@ class PhotoEditorView @JvmOverloads constructor(
         //               view's pivot. Better seperation of layouts here could be an improvement.
         // NOTE(cheng): This should be moved out of this method
         canvasLayout = RelativeLayout(context)
-        canvasLayout!!.id = parentLayoutId
+        canvasLayout!!.id = canvasLayoutId
         val rotateLayoutParam = RelativeLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
         )
@@ -251,5 +279,6 @@ class PhotoEditorView @JvmOverloads constructor(
         private const val imgOverlayId = 4
         private const val imgBackgroundId = 5
         private const val parentLayoutId = 6
+        private const val canvasLayoutId = 7
     }
 }
