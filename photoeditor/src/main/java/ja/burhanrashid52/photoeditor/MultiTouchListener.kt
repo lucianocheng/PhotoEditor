@@ -8,10 +8,15 @@ import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
-import android.widget.ImageView
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.RelativeLayout
-import java.util.*
+import android.widget.TextView
+import androidx.core.view.setMargins
+import androidx.core.view.setPadding
+import java.util.Date
 
 /**
  * Touch listener for stickers, emoji, text, etc.
@@ -358,13 +363,17 @@ class MultiTouchListener(
         }
 
         fun fixHandlesSizes(view: View, editorScaleX: Float) {
+            val viewCenterX = view.x + view.width / 2
+            val viewCenterY = view.y + view.height / 2
+
             val imgHandleTopLeft = view.findViewById<View>(R.id.imgHandleTopLeft)
             val imgHandleTopRight = view.findViewById<View>(R.id.imgHandleTopRight)
             val imgHandleBottomLeft = view.findViewById<View>(R.id.imgHandleBottomLeft)
             val imgHandleBottomRight = view.findViewById<View>(R.id.imgHandleBottomRight)
+            val frmBorder = view.findViewById<View>(R.id.frmBorder)
 
             if (imgHandleTopLeft != null && imgHandleTopRight != null
-                && imgHandleBottomLeft != null && imgHandleBottomRight != null) {
+                && imgHandleBottomLeft != null && imgHandleBottomRight != null && frmBorder != null) {
 
                 val standardHandleSize = view.resources.getDimension(R.dimen.handle_size)
                 val adjustedHandleSize = standardHandleSize / editorScaleX
@@ -391,6 +400,19 @@ class MultiTouchListener(
                         it.layoutParams.height = adjustedHandleSize.toInt()
                         it.requestLayout()
                     }
+
+                    frmBorder.setPadding(adjustedHandleSize.toInt())
+
+                    view.viewTreeObserver.addOnGlobalLayoutListener(object :
+                        ViewTreeObserver.OnGlobalLayoutListener {
+                        override fun onGlobalLayout() {
+                            view.x = viewCenterX - view.width / 2
+                            view.y = viewCenterY - view.height / 2
+
+                            // Remove listener after being called so it doesn't loop on every change.
+                            view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        }
+                    })
                 }
             }
         }
