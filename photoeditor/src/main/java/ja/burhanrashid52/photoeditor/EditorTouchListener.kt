@@ -146,6 +146,9 @@ internal class EditorTouchListener(
             if (viewState.currentSelectedView != null) {
                 initialScale = viewState.currentSelectedView!!.scaleX
                 initialRotation = viewState.currentSelectedView!!.rotation
+                viewState.currentSelectedView?.let {
+                    mOnPhotoEditorListener?.onGraphicActionDown(it)
+                }
             }
             mPrevSpanVector.set(detector.getCurrentSpanVector())
 
@@ -164,11 +167,11 @@ internal class EditorTouchListener(
             info.deltaY = if (isTranslateEnabled) detector.getFocusY() - mPivotY else 0.0f
             info.pivotX = mPivotX
             info.pivotY = mPivotY
-            if (viewState.currentSelectedView != null) {
-                move(
-                    viewState.currentSelectedView!!,
+            viewState.currentSelectedView?.let {
+                mOnPhotoEditorListener?.onGraphicMove(
+                    it,
                     info,
-                    photoEditorView.parentLayout!!.scaleX,
+                    photoEditorView.parentLayout.scaleX,
                     initialScale,
                     initialRotation
                 )

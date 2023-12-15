@@ -26,6 +26,12 @@ internal class GraphicManager(
         mCanvasView.addView(view, params)
         mViewState.addAddedView(view)
 
+        // NOTE(fleissig): we can center the text because we already know its size
+        if (graphic is Text) {
+            view.x = mCanvasView.width/2f - view.width/2f
+            view.y = mCanvasView.height/2f - view.height/2f
+        }
+
         onPhotoEditorListener?.onAddViewListener(
             graphic.viewType,
             mViewState.addedViewsCount
