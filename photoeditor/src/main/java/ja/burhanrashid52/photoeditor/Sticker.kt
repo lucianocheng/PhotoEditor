@@ -1,8 +1,8 @@
 package ja.burhanrashid52.photoeditor
 
-import android.widget.RelativeLayout
 import android.graphics.Bitmap
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 
 /**
@@ -11,7 +11,7 @@ import android.widget.ImageView
  * @author <https:></https:>//github.com/burhanrashid52>
  */
 internal class Sticker(
-    private val mCanvasView: RelativeLayout,
+    private val mCanvasView: ViewGroup,
     private val mPhotoEditorView: PhotoEditorView,
     private val mMultiTouchListener: MultiTouchListener,
     private val mViewState: PhotoEditorViewState,

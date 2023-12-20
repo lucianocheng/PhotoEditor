@@ -30,7 +30,7 @@ import java.util.Date
 class MultiTouchListener(
     deleteView: View?,
     photoEditorView: PhotoEditorView,
-    canvasView: RelativeLayout,
+    canvasView: ViewGroup,
     photoEditImageView: ImageView?,
     private val mIsPinchScalable: Boolean,
     onPhotoEditorListener: OnPhotoEditorListener?,
@@ -57,7 +57,7 @@ class MultiTouchListener(
     private val deleteView: View?
     private val photoEditImageView: ImageView?
     val photoEditorView: PhotoEditorView
-    var canvasView: RelativeLayout
+    var canvasView: ViewGroup
     private var onMultiTouchListener: OnMultiTouchListener? = null
     private var mOnGestureControl: OnGestureControl? = null
     private val mOnPhotoEditorListener: OnPhotoEditorListener?
@@ -363,6 +363,9 @@ class MultiTouchListener(
         }
 
         fun fixHandlesSizes(view: View, editorScaleX: Float) {
+            val width = view.width
+            val height = view.height
+
             val viewCenterX = view.x + view.width / 2
             val viewCenterY = view.y + view.height / 2
 
@@ -371,6 +374,8 @@ class MultiTouchListener(
             val imgHandleBottomLeft = view.findViewById<View>(R.id.imgHandleBottomLeft)
             val imgHandleBottomRight = view.findViewById<View>(R.id.imgHandleBottomRight)
             val frmBorder = view.findViewById<View>(R.id.frmBorder)
+            val imgPhotoEditorImage = view.findViewById<View>(R.id.imgPhotoEditorImage)
+            val tvPhotoEditorText = view.findViewById<View>(R.id.tvPhotoEditorText)
 
             if (imgHandleTopLeft != null && imgHandleTopRight != null
                 && imgHandleBottomLeft != null && imgHandleBottomRight != null && frmBorder != null) {
@@ -401,7 +406,14 @@ class MultiTouchListener(
                         it.requestLayout()
                     }
 
-                    frmBorder.setPadding(adjustedHandleSize.toInt())
+                    if (imgPhotoEditorImage != null) {
+                        view.layoutParams.width = width - 2 * (handleSize - adjustedHandleSize).toInt()
+                        view.layoutParams.height = height - 2 * (handleSize - adjustedHandleSize).toInt()
+                        view.requestLayout()
+                    }
+                    else if (tvPhotoEditorText != null) {
+                        frmBorder.setPadding(adjustedHandleSize.toInt())
+                    }
 
                     view.viewTreeObserver.addOnGlobalLayoutListener(object :
                         ViewTreeObserver.OnGlobalLayoutListener {

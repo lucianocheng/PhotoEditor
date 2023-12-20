@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -286,7 +287,7 @@ interface PhotoEditor {
      */
     class Builder(var context: Context, var photoEditorView: PhotoEditorView) {
         @JvmField
-        var canvasView: RelativeLayout
+        var canvasView: FrameLayout
         @JvmField
         var imageView: ImageView? = null
         @JvmField

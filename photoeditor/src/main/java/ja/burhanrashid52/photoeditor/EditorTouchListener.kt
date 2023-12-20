@@ -12,6 +12,7 @@ import ja.burhanrashid52.photoeditor.MultiTouchListener.TransformInfo
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 
 /**
  * Touch listener for main editor. Used for resizing the main image, background,
@@ -23,7 +24,7 @@ import android.view.View
  */
 internal class EditorTouchListener(
     photoEditorView: PhotoEditorView,
-    canvasView: RelativeLayout,
+    canvasView: ViewGroup,
     viewState: PhotoEditorViewState
 ) : OnTouchListener {
     private val mGestureListener: GestureDetector
@@ -37,7 +38,7 @@ internal class EditorTouchListener(
     private var mPrevY = 0f
     private val mScaleGestureDetector: ScaleGestureDetector
     private val photoEditorView: PhotoEditorView
-    private val canvasView: RelativeLayout
+    private val canvasView: ViewGroup
     private val boxHelper: BoxHelper
     private var mOnPhotoEditorListener: OnPhotoEditorListener? = null
     private var isTouchMovable = false

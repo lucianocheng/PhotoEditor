@@ -7,6 +7,7 @@ import android.graphics.Typeface
 import android.text.TextUtils
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -108,7 +109,7 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
 
     // NOTE(kleyow): This is custom added code diverging from https://github.com/burhanrashid52/PhotoEditor
     private val mEditorTouchListener: EditorTouchListener
-    private val canvasView: RelativeLayout = builder.canvasView
+    private val canvasView: ViewGroup = builder.canvasView
 
     // NOTE(cheng): The two values below are not hooked up
     private val overlayView: ImageView = builder.overlayView
