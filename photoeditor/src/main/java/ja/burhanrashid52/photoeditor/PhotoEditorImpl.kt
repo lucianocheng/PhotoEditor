@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.text.TextUtils
-import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
@@ -41,66 +40,7 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
     private val mBrushDrawingStateListener: BrushDrawingStateListener =
         BrushDrawingStateListener(builder.photoEditorView, viewState)
     private val mBoxHelper: BoxHelper = BoxHelper(builder.canvasView, viewState)
-    private val mOnPhotoEditorListener = object : OnPhotoEditorListener {
-        override fun onEditTextChangeListener(rootView: View, text: String, colorCode: Int) {
-            onPhotoEditorListener?.onEditTextChangeListener(rootView, text, colorCode)
-        }
-
-        override fun onAddViewListener(viewType: ViewType, numberOfAddedViews: Int) {
-            onPhotoEditorListener?.onAddViewListener(viewType, numberOfAddedViews)
-        }
-
-        override fun onRemoveViewListener(viewType: ViewType, numberOfAddedViews: Int) {
-            onPhotoEditorListener?.onRemoveViewListener(viewType, numberOfAddedViews)
-        }
-
-        override fun onStartViewChangeListener(viewType: ViewType) {
-            onPhotoEditorListener?.onStartViewChangeListener(viewType)
-        }
-
-        override fun onMoveViewChangeListener(viewType: ViewType?) {
-            onPhotoEditorListener?.onMoveViewChangeListener(viewType)
-        }
-
-        override fun onStopViewChangeListener(viewType: ViewType) {
-            onPhotoEditorListener?.onStopViewChangeListener(viewType)
-        }
-
-        override fun onTouchSourceImage(event: MotionEvent) {
-            onPhotoEditorListener?.onTouchSourceImage(event)
-        }
-
-        override fun onRotateViewListener() {
-            onPhotoEditorListener?.onRotateViewListener()
-        }
-
-        override fun onMirrorViewListener() {
-            onPhotoEditorListener?.onMirrorViewListener()
-        }
-
-        override fun onInFocusViewChangeListener(view: View?) {
-            view?.let {
-                MultiTouchListener.fixHandlesSizes(view, photoEditorView.parentLayout.scaleX)
-            }
-
-            onPhotoEditorListener?.onInFocusViewChangeListener(view)
-        }
-
-        override fun onGraphicMove(
-            view: View,
-            info: MultiTouchListener.TransformInfo,
-            editorScaleX: Float,
-            initialStickerScale: Float,
-            initialStickerRotation: Float
-        ) {
-            onPhotoEditorListener?.onGraphicMove(view, info, editorScaleX, initialStickerScale, initialStickerRotation)
-        }
-
-        override fun onGraphicActionDown(view: View) {
-            onPhotoEditorListener?.onGraphicActionDown(view)
-        }
-    }
-    private var onPhotoEditorListener: OnPhotoEditorListener? = null
+    private var mOnPhotoEditorListener: OnPhotoEditorListener? = null
     private val isTextPinchScalable: Boolean = builder.isTextPinchScalable
     private val mDefaultTextTypeface: Typeface? = builder.textTypeface
     private val mDefaultEmojiTypeface: Typeface? = builder.emojiTypeface
@@ -448,7 +388,7 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
     }
 
     override fun setOnPhotoEditorListener(onPhotoEditorListener: OnPhotoEditorListener) {
-        this.onPhotoEditorListener = onPhotoEditorListener
+        mOnPhotoEditorListener = onPhotoEditorListener
         mGraphicManager.onPhotoEditorListener = mOnPhotoEditorListener
         mBrushDrawingStateListener.setOnPhotoEditorListener(mOnPhotoEditorListener)
         mEditorTouchListener.setOnPhotoEditorListener(mOnPhotoEditorListener)
@@ -472,16 +412,10 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
 
     override fun changeZoom(zoom: Float) {
         photoEditorView.changeZoom(zoom)
-        viewState.currentSelectedView?.let {
-            MultiTouchListener.fixHandlesSizes(it, photoEditorView.parentLayout.scaleX)
-        }
     }
 
     override fun resetZoom() {
         photoEditorView.resetZoom()
-        viewState.currentSelectedView?.let {
-            MultiTouchListener.fixHandlesSizes(it, photoEditorView.parentLayout.scaleX)
-        }
     }
 
     override val zoomLiveData: LiveData<Float>
