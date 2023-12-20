@@ -37,7 +37,6 @@ import com.burhanrashid52.photoediting.tools.EditingToolsAdapter
 import com.burhanrashid52.photoediting.tools.EditingToolsAdapter.OnItemSelected
 import com.burhanrashid52.photoediting.tools.ToolType
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import ja.burhanrashid52.photoeditor.MultiTouchListener
 import ja.burhanrashid52.photoeditor.OnPhotoEditorListener
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoEditorView
@@ -235,18 +234,6 @@ class EditImageActivity : BaseActivity(), OnPhotoEditorListener, View.OnClickLis
     }
 
     override fun onInFocusViewChangeListener(view: View?) {
-    }
-
-    override fun onGraphicActionDown(view: View) {
-    }
-
-    override fun onGraphicMove(
-        view: View,
-        info: MultiTouchListener.TransformInfo,
-        editorScaleX: Float,
-        initialStickerScale: Float,
-        initialStickerRotation: Float
-    ) {
     }
 
     @SuppressLint("NonConstantResourceId", "MissingPermission")

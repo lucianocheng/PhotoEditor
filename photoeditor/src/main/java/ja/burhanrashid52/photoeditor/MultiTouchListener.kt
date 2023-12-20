@@ -1,22 +1,19 @@
 package ja.burhanrashid52.photoeditor
 
-import android.graphics.Matrix
 import android.graphics.Rect
+import android.graphics.Matrix
 import android.util.Log
+import android.widget.RelativeLayout
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.core.view.setMargins
-import androidx.core.view.setPadding
-import java.util.Date
+import android.widget.FrameLayout
+import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Touch listener for stickers, emoji, text, etc.
@@ -92,9 +89,6 @@ class MultiTouchListener(
 
         // NOTE(cheng): This view is the root view.  E.g., the imageRootView
         if (view === viewState.currentSelectedView) {
-            if (event.action and event.actionMasked == MotionEvent.ACTION_DOWN) {
-                mOnPhotoEditorListener?.onGraphicActionDown(view)
-            }
             mScaleGestureDetector.onTouchEvent(view, event)
         }
         mGestureListener.onTouchEvent(event)
@@ -266,10 +260,10 @@ class MultiTouchListener(
             // TODO(cheng): Determines why these are disabled.
             // info.minimumScale = minimumScale
             //info.maximumScale = maximumScale
-            mOnPhotoEditorListener?.onGraphicMove(
+            move(
                 view,
                 info,
-                photoEditorView.parentLayout.scaleX,
+                photoEditorView.scaleX,
                 view.scaleX,
                 view.rotation
             )
@@ -359,61 +353,6 @@ class MultiTouchListener(
                     degrees + 360.0f
                 }
                 else -> degrees
-            }
-        }
-
-        fun fixHandlesSizes(view: View, editorScaleX: Float) {
-            val viewCenterX = view.x + view.width / 2
-            val viewCenterY = view.y + view.height / 2
-
-            val imgHandleTopLeft = view.findViewById<View>(R.id.imgHandleTopLeft)
-            val imgHandleTopRight = view.findViewById<View>(R.id.imgHandleTopRight)
-            val imgHandleBottomLeft = view.findViewById<View>(R.id.imgHandleBottomLeft)
-            val imgHandleBottomRight = view.findViewById<View>(R.id.imgHandleBottomRight)
-            val frmBorder = view.findViewById<View>(R.id.frmBorder)
-
-            if (imgHandleTopLeft != null && imgHandleTopRight != null
-                && imgHandleBottomLeft != null && imgHandleBottomRight != null && frmBorder != null) {
-
-                val standardHandleSize = view.resources.getDimension(R.dimen.handle_size)
-                val adjustedHandleSize = standardHandleSize / editorScaleX
-                val handleSize = imgHandleTopLeft.width
-
-                if (handleSize != adjustedHandleSize.toInt()) {
-                    imgHandleTopLeft.let {
-                        it.layoutParams.width = adjustedHandleSize.toInt()
-                        it.layoutParams.height = adjustedHandleSize.toInt()
-                        it.requestLayout()
-                    }
-                    imgHandleTopRight.let {
-                        it.layoutParams.width = adjustedHandleSize.toInt()
-                        it.layoutParams.height = adjustedHandleSize.toInt()
-                        it.requestLayout()
-                    }
-                    imgHandleBottomLeft.let {
-                        it.layoutParams.width = adjustedHandleSize.toInt()
-                        it.layoutParams.height = adjustedHandleSize.toInt()
-                        it.requestLayout()
-                    }
-                    imgHandleBottomRight.let {
-                        it.layoutParams.width = adjustedHandleSize.toInt()
-                        it.layoutParams.height = adjustedHandleSize.toInt()
-                        it.requestLayout()
-                    }
-
-                    frmBorder.setPadding(adjustedHandleSize.toInt())
-
-                    view.viewTreeObserver.addOnGlobalLayoutListener(object :
-                        ViewTreeObserver.OnGlobalLayoutListener {
-                        override fun onGlobalLayout() {
-                            view.x = viewCenterX - view.width / 2
-                            view.y = viewCenterY - view.height / 2
-
-                            // Remove listener after being called so it doesn't loop on every change.
-                            view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                        }
-                    })
-                }
             }
         }
 
