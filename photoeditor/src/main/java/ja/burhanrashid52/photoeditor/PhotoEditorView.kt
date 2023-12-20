@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.util.AttributeSet
 import android.util.Log
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import ja.burhanrashid52.photoeditor.FilterImageView.OnImageChangedListener
@@ -58,7 +59,7 @@ class PhotoEditorView @JvmOverloads constructor(
      */
     lateinit var parentLayout: RelativeLayout
         private set
-    lateinit var canvasLayout: RelativeLayout
+    lateinit var canvasLayout: FrameLayout
         private set
 
     init {
@@ -215,7 +216,7 @@ class PhotoEditorView @JvmOverloads constructor(
         // NOTE(kleyow): Seperate the view into layers so functionality is not fighting over a
         //               view's pivot. Better seperation of layouts here could be an improvement.
         // NOTE(cheng): This should be moved out of this method
-        canvasLayout = RelativeLayout(context)
+        canvasLayout = FrameLayout(context)
         canvasLayout!!.id = canvasLayoutId
         val rotateLayoutParam = RelativeLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT

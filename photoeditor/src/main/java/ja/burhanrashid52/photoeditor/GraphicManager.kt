@@ -2,6 +2,7 @@ package ja.burhanrashid52.photoeditor
 
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
 
 /**
@@ -10,7 +11,7 @@ import android.widget.RelativeLayout
  * @author <https:></https:>//github.com/burhanrashid52>
  */
 internal class GraphicManager(
-    private val mCanvasView: RelativeLayout,
+    private val mCanvasView: ViewGroup,
     private val mViewState: PhotoEditorViewState
 ) {
     var onPhotoEditorListener: OnPhotoEditorListener? = null
@@ -25,6 +26,27 @@ internal class GraphicManager(
         // params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         mCanvasView.addView(view, params)
         mViewState.addAddedView(view)
+
+        // NOTE(fleissig): we can center the text because we already know its size
+        if (graphic is Text) {
+            view.x = mCanvasView.width/2f - view.width/2f
+            view.y = mCanvasView.height/2f - view.height/2f
+        }
+        else if (graphic is Sticker) {
+            view.viewTreeObserver.addOnGlobalLayoutListener(object :
+                ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    val stickerDefSize = graphic.context.resources.getDimension(R.dimen.default_sticker_size)
+                    view.layoutParams.width = stickerDefSize.toInt()
+                    view.layoutParams.height = stickerDefSize.toInt()
+
+                    view.requestLayout()
+
+                    // Remove listener after being called so it doesn't loop on every change.
+                    view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                }
+            })
+        }
 
         onPhotoEditorListener?.onAddViewListener(
             graphic.viewType,

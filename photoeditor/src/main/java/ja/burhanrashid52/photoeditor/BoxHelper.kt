@@ -1,8 +1,7 @@
 package ja.burhanrashid52.photoeditor
 
 import android.view.View
-import android.widget.RelativeLayout
-import android.widget.FrameLayout
+import android.view.ViewGroup
 import android.widget.ImageView
 
 /**
@@ -11,13 +10,13 @@ import android.widget.ImageView
  * @author <https:></https:>//github.com/burhanrashid52>
  */
 internal class BoxHelper(
-    private val mCanvasView: RelativeLayout,
+    private val mCanvasView: ViewGroup,
     private val mViewState: PhotoEditorViewState
 ) {
     fun clearHelperBox() {
         for (i in 0 until mCanvasView.childCount) {
             val childAt = mCanvasView.getChildAt(i)
-            val frmBorder = childAt.findViewById<FrameLayout>(R.id.frmBorder)
+            val frmBorder = childAt.findViewById<ViewGroup>(R.id.frmBorder)
             frmBorder?.setBackgroundResource(0)
             val imgClose: ImageView? = null
             imgClose?.visibility = View.GONE

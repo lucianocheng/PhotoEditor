@@ -1,19 +1,22 @@
 package ja.burhanrashid52.photoeditor
 
-import android.graphics.Rect
 import android.graphics.Matrix
+import android.graphics.Rect
 import android.util.Log
-import android.widget.RelativeLayout
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
-import android.widget.ImageView
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
-import java.util.*
-import kotlin.math.max
-import kotlin.math.min
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import android.widget.TextView
+import androidx.core.view.setMargins
+import androidx.core.view.setPadding
+import java.util.Date
 
 /**
  * Touch listener for stickers, emoji, text, etc.
@@ -27,7 +30,7 @@ import kotlin.math.min
 class MultiTouchListener(
     deleteView: View?,
     photoEditorView: PhotoEditorView,
-    canvasView: RelativeLayout,
+    canvasView: ViewGroup,
     photoEditImageView: ImageView?,
     private val mIsPinchScalable: Boolean,
     onPhotoEditorListener: OnPhotoEditorListener?,
@@ -54,7 +57,7 @@ class MultiTouchListener(
     private val deleteView: View?
     private val photoEditImageView: ImageView?
     val photoEditorView: PhotoEditorView
-    var canvasView: RelativeLayout
+    var canvasView: ViewGroup
     private var onMultiTouchListener: OnMultiTouchListener? = null
     private var mOnGestureControl: OnGestureControl? = null
     private val mOnPhotoEditorListener: OnPhotoEditorListener?
@@ -89,6 +92,9 @@ class MultiTouchListener(
 
         // NOTE(cheng): This view is the root view.  E.g., the imageRootView
         if (view === viewState.currentSelectedView) {
+            if (event.action and event.actionMasked == MotionEvent.ACTION_DOWN) {
+                mOnPhotoEditorListener?.onGraphicActionDown(view)
+            }
             mScaleGestureDetector.onTouchEvent(view, event)
         }
         mGestureListener.onTouchEvent(event)
@@ -260,10 +266,10 @@ class MultiTouchListener(
             // TODO(cheng): Determines why these are disabled.
             // info.minimumScale = minimumScale
             //info.maximumScale = maximumScale
-            move(
+            mOnPhotoEditorListener?.onGraphicMove(
                 view,
                 info,
-                photoEditorView.scaleX,
+                photoEditorView.parentLayout.scaleX,
                 view.scaleX,
                 view.rotation
             )
@@ -353,6 +359,73 @@ class MultiTouchListener(
                     degrees + 360.0f
                 }
                 else -> degrees
+            }
+        }
+
+        fun fixHandlesSizes(view: View, editorScaleX: Float) {
+            val width = view.width
+            val height = view.height
+
+            val viewCenterX = view.x + view.width / 2
+            val viewCenterY = view.y + view.height / 2
+
+            val imgHandleTopLeft = view.findViewById<View>(R.id.imgHandleTopLeft)
+            val imgHandleTopRight = view.findViewById<View>(R.id.imgHandleTopRight)
+            val imgHandleBottomLeft = view.findViewById<View>(R.id.imgHandleBottomLeft)
+            val imgHandleBottomRight = view.findViewById<View>(R.id.imgHandleBottomRight)
+            val frmBorder = view.findViewById<View>(R.id.frmBorder)
+            val imgPhotoEditorImage = view.findViewById<View>(R.id.imgPhotoEditorImage)
+            val tvPhotoEditorText = view.findViewById<View>(R.id.tvPhotoEditorText)
+
+            if (imgHandleTopLeft != null && imgHandleTopRight != null
+                && imgHandleBottomLeft != null && imgHandleBottomRight != null && frmBorder != null) {
+
+                val standardHandleSize = view.resources.getDimension(R.dimen.handle_size)
+                val adjustedHandleSize = standardHandleSize / editorScaleX
+                val handleSize = imgHandleTopLeft.width
+
+                if (handleSize != adjustedHandleSize.toInt()) {
+                    imgHandleTopLeft.let {
+                        it.layoutParams.width = adjustedHandleSize.toInt()
+                        it.layoutParams.height = adjustedHandleSize.toInt()
+                        it.requestLayout()
+                    }
+                    imgHandleTopRight.let {
+                        it.layoutParams.width = adjustedHandleSize.toInt()
+                        it.layoutParams.height = adjustedHandleSize.toInt()
+                        it.requestLayout()
+                    }
+                    imgHandleBottomLeft.let {
+                        it.layoutParams.width = adjustedHandleSize.toInt()
+                        it.layoutParams.height = adjustedHandleSize.toInt()
+                        it.requestLayout()
+                    }
+                    imgHandleBottomRight.let {
+                        it.layoutParams.width = adjustedHandleSize.toInt()
+                        it.layoutParams.height = adjustedHandleSize.toInt()
+                        it.requestLayout()
+                    }
+
+                    if (imgPhotoEditorImage != null) {
+                        view.layoutParams.width = width - 2 * (handleSize - adjustedHandleSize).toInt()
+                        view.layoutParams.height = height - 2 * (handleSize - adjustedHandleSize).toInt()
+                        view.requestLayout()
+                    }
+                    else if (tvPhotoEditorText != null) {
+                        frmBorder.setPadding(adjustedHandleSize.toInt())
+                    }
+
+                    view.viewTreeObserver.addOnGlobalLayoutListener(object :
+                        ViewTreeObserver.OnGlobalLayoutListener {
+                        override fun onGlobalLayout() {
+                            view.x = viewCenterX - view.width / 2
+                            view.y = viewCenterY - view.height / 2
+
+                            // Remove listener after being called so it doesn't loop on every change.
+                            view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        }
+                    })
+                }
             }
         }
 
