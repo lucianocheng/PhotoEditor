@@ -28,13 +28,27 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
     private var scale = 1.0f
     private var lastScaleFactor = 0f
 
+    private val _dxLiveData = MutableLiveData(0f)
+    val dxLiveData: LiveData<Float> = _dxLiveData
+
+    private val _dyLiveData = MutableLiveData(0f)
+    val dyLiveData: LiveData<Float> = _dyLiveData
+
     // Where the finger first  touches the screen.
     private var startX = 0f
     private var startY = 0f
 
     // How much to translate the canvas.
     private var dx = 0f
+        set(value) {
+            field = value
+            _dxLiveData.value = value
+        }
     private var dy = 0f
+        set(value) {
+            field = value
+            _dyLiveData.value = value
+        }
     private var prevDx = 0f
     private var prevDy = 0f
     var lockedZoom = false
@@ -164,6 +178,8 @@ open class ZoomLayout : FrameLayout, ScaleGestureDetector.OnScaleGestureListener
             dy = 0f
             applyScaleAndTranslation()
             _zoomLiveData.value = scale
+            _dxLiveData.value = dx
+            _dyLiveData.value = dy
         }
     }
 

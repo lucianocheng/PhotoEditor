@@ -281,6 +281,8 @@ interface PhotoEditor {
     fun resetZoom()
     val zoomLiveData: LiveData<Float>
     val viewState: PhotoEditorViewState
+    val canvasTranslateX: LiveData<Float>
+    val canvasTranslateY: LiveData<Float>
 
     /**
      * Builder pattern to define [PhotoEditor] Instance
