@@ -15,7 +15,7 @@ internal class GraphicManager(
     private val mViewState: PhotoEditorViewState
 ) {
     var onPhotoEditorListener: OnPhotoEditorListener? = null
-    fun addView(graphic: Graphic, graphicScale: Float = 1.0f, graphicTranslationX: Float = 0f, graphicTranslationY: Float = 0f) {
+    fun addView(graphic: Graphic) {
         val view = graphic.rootView
         val params = RelativeLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
@@ -27,31 +27,26 @@ internal class GraphicManager(
         mCanvasView.addView(view, params)
         mViewState.addAddedView(view)
 
-        view.viewTreeObserver.addOnGlobalLayoutListener(object :
-            ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                if (graphic is Sticker) {
+        // NOTE(fleissig): we can center the text because we already know its size
+        if (graphic is Text) {
+            view.x = mCanvasView.width/2f - view.width/2f
+            view.y = mCanvasView.height/2f - view.height/2f
+        }
+        else if (graphic is Sticker) {
+            view.viewTreeObserver.addOnGlobalLayoutListener(object :
+                ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
                     val stickerDefSize = graphic.context.resources.getDimension(R.dimen.default_sticker_size)
-                    view.layoutParams.width = (stickerDefSize * graphicScale).toInt()
-                    view.layoutParams.height = (stickerDefSize * graphicScale).toInt()
+                    view.layoutParams.width = stickerDefSize.toInt()
+                    view.layoutParams.height = stickerDefSize.toInt()
+
                     view.requestLayout()
-                }
 
-                // Set the position after the layout pass is completed
-                view.post {
-                    if (graphicScale == 1f) {
-                        view.x = (mCanvasView.width - view.width) / 2f
-                        view.y = (mCanvasView.height - view.height) / 2f
-                    } else {
-                        view.x = graphicTranslationX
-                        view.y = graphicTranslationY
-                    }
+                    // Remove listener after being called so it doesn't loop on every change.
+                    view.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
-
-                // Remove listener after being called so it doesn't loop on every change.
-                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })
+            })
+        }
 
         onPhotoEditorListener?.onAddViewListener(
             graphic.viewType,

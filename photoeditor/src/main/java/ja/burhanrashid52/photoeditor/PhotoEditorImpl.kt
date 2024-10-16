@@ -251,16 +251,8 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
     }
 
     private fun addToEditor(graphic: Graphic) {
-        val zoomValue = zoomLiveData.value ?: 1f
-        val canvasTranslateX = canvasTranslateX.value ?: 0f
-        val canvasTranslateY = canvasTranslateY.value ?: 0f
-
-        val graphicScale = 1f / zoomValue
-        val graphicTranslationX = -canvasTranslateX * graphicScale
-        val graphicTranslationY = -canvasTranslateY * graphicScale
-
         clearHelperBox()
-        mGraphicManager.addView(graphic, graphicScale, graphicTranslationX, graphicTranslationY)
+        mGraphicManager.addView(graphic)
         // Change the in-focus view
         viewState.currentSelectedView = graphic.rootView
     }
@@ -495,12 +487,6 @@ internal class PhotoEditorImpl @SuppressLint("ClickableViewAccessibility") const
 
     override val zoomLiveData: LiveData<Float>
         get() = photoEditorView.zoomLiveData
-
-    override val canvasTranslateX: LiveData<Float>
-        get() = photoEditorView.dxLiveData
-
-    override val canvasTranslateY: LiveData<Float>
-        get() = photoEditorView.dyLiveData
 
     override fun getMainImageLockValue(): Boolean {
         return photoEditorView.lockedZoom
